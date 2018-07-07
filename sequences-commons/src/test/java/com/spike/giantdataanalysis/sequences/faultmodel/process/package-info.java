@@ -24,7 +24,7 @@
  * Notes: i am not really good at pointer/array/linkedlist operations :-(
  * 
  * 2 process pair
- * not support takeover!!!
+ * not support takeover!!! - now it is! 20180707 using <code>Processes.primaryProcess</code>
  * 
  * 3 Process.start()
  * not support codeing and cache, i.e. the State is hard coded

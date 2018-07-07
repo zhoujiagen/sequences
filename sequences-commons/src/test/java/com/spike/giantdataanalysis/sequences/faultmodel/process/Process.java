@@ -310,7 +310,7 @@ class Process {
   }
 
   private String simpleToString() {
-    return "Process " + processId + " ";
+    return "Process " + processId;
   }
 
   @Override
