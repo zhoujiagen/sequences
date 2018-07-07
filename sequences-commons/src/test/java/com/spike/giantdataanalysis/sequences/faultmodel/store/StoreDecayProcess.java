@@ -30,7 +30,8 @@ class StoreDecayProcess implements Runnable {
       }
 
       if (now > nextStoreFailTime) {
-        int pickedStoreIndex = (int) (StoreConfiguration.STORE_NUMBER * new Random(now).nextDouble());
+        int pickedStoreIndex =
+            (int) (StoreConfiguration.STORE_NUMBER * new Random(now).nextDouble());
         Store pickedStore = stores.stores[pickedStoreIndex];
         pickedStore.status = false;
         for (Page page : pickedStore.pages) { // 存储下页一并失效
@@ -41,7 +42,8 @@ class StoreDecayProcess implements Runnable {
       }
 
       if (now > nextPageFailTime) {
-        int pickedStoreIndex = (int) (StoreConfiguration.STORE_NUMBER * new Random(now).nextDouble());
+        int pickedStoreIndex =
+            (int) (StoreConfiguration.STORE_NUMBER * new Random(now).nextDouble());
         Store pickedStore = stores.stores[pickedStoreIndex];
 
         int pickedPageIndex =

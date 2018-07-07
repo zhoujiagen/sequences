@@ -410,8 +410,8 @@ public class MoreBytes {
     return toStringBinary(toBytes(buf));
   }
 
-  private static final char[] HEX_CHARS_UPPER = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-      'A', 'B', 'C', 'D', 'E', 'F' };
+  private static final char[] HEX_CHARS_UPPER =
+      { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
   /**
    * Write a printable representation of a byte array. Non-printable characters are hex escaped in
@@ -581,9 +581,8 @@ public class MoreBytes {
     if (length != expectedLength) {
       reason = "Wrong length: " + length + ", expected " + expectedLength;
     } else {
-      reason =
-          "offset (" + offset + ") + length (" + length + ") exceed the"
-              + " capacity of the array: " + bytes.length;
+      reason = "offset (" + offset + ") + length (" + length + ") exceed the"
+          + " capacity of the array: " + bytes.length;
     }
     return new IllegalArgumentException(reason);
   }
@@ -773,11 +772,11 @@ public class MoreBytes {
    */
   public static int toIntUnsafe(byte[] bytes, int offset) {
     if (UnsafeComparer.littleEndian) {
-      return Integer.reverseBytes(UnsafeComparer.theUnsafe.getInt(bytes, (long) offset
-          + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
+      return Integer.reverseBytes(UnsafeComparer.theUnsafe.getInt(bytes,
+        (long) offset + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
     } else {
-      return UnsafeComparer.theUnsafe.getInt(bytes, (long) offset
-          + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
+      return UnsafeComparer.theUnsafe.getInt(bytes,
+        (long) offset + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
     }
   }
 
@@ -789,11 +788,11 @@ public class MoreBytes {
    */
   public static short toShortUnsafe(byte[] bytes, int offset) {
     if (UnsafeComparer.littleEndian) {
-      return Short.reverseBytes(UnsafeComparer.theUnsafe.getShort(bytes, (long) offset
-          + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
+      return Short.reverseBytes(UnsafeComparer.theUnsafe.getShort(bytes,
+        (long) offset + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
     } else {
-      return UnsafeComparer.theUnsafe.getShort(bytes, (long) offset
-          + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
+      return UnsafeComparer.theUnsafe.getShort(bytes,
+        (long) offset + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
     }
   }
 
@@ -805,11 +804,11 @@ public class MoreBytes {
    */
   public static long toLongUnsafe(byte[] bytes, int offset) {
     if (UnsafeComparer.littleEndian) {
-      return Long.reverseBytes(UnsafeComparer.theUnsafe.getLong(bytes, (long) offset
-          + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
+      return Long.reverseBytes(UnsafeComparer.theUnsafe.getLong(bytes,
+        (long) offset + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET));
     } else {
-      return UnsafeComparer.theUnsafe.getLong(bytes, (long) offset
-          + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
+      return UnsafeComparer.theUnsafe.getLong(bytes,
+        (long) offset + UnsafeComparer.BYTE_ARRAY_BASE_OFFSET);
     }
   }
 
@@ -1178,10 +1177,10 @@ public class MoreBytes {
    * @param length2 How much to compare from the right buffer
    * @return 0 if equal, &lt; 0 if left is less than right, etc.
    */
-  public static int compareTo(byte[] buffer1, int offset1, int length1, byte[] buffer2,
-      int offset2, int length2) {
-    return LexicographicalComparerHolder.BEST_COMPARER.compareTo(buffer1, offset1, length1,
-      buffer2, offset2, length2);
+  public static int compareTo(byte[] buffer1, int offset1, int length1, byte[] buffer2, int offset2,
+      int length2) {
+    return LexicographicalComparerHolder.BEST_COMPARER.compareTo(buffer1, offset1, length1, buffer2,
+      offset2, length2);
   }
 
   interface Comparer<T> {
@@ -1202,8 +1201,8 @@ public class MoreBytes {
    */
   @VisibleForTesting
   static class LexicographicalComparerHolder {
-    static final String UNSAFE_COMPARER_NAME = LexicographicalComparerHolder.class.getName()
-        + "$UnsafeComparer";
+    static final String UNSAFE_COMPARER_NAME =
+        LexicographicalComparerHolder.class.getName() + "$UnsafeComparer";
 
     static final Comparer<byte[]> BEST_COMPARER = getBestComparer();
 
@@ -1459,11 +1458,9 @@ public class MoreBytes {
    * Return true if the byte array on the right is a prefix of the byte array on the left.
    */
   public static boolean startsWith(byte[] bytes, byte[] prefix) {
-    return bytes != null
-        && prefix != null
-        && bytes.length >= prefix.length
-        && LexicographicalComparerHolder.BEST_COMPARER.compareTo(bytes, 0, prefix.length, prefix,
-          0, prefix.length) == 0;
+    return bytes != null && prefix != null && bytes.length >= prefix.length
+        && LexicographicalComparerHolder.BEST_COMPARER.compareTo(bytes, 0, prefix.length, prefix, 0,
+          prefix.length) == 0;
   }
 
   /**
@@ -2235,8 +2232,8 @@ public class MoreBytes {
     return result;
   }
 
-  private static final char[] HEX_CHARS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
-      'b', 'c', 'd', 'e', 'f' };
+  private static final char[] HEX_CHARS =
+      { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
   /**
    * Convert a byte range into a hex string

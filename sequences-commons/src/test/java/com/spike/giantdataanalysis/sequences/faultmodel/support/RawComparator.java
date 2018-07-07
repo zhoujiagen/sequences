@@ -5,9 +5,8 @@ import java.util.Comparator;
 public interface RawComparator<T> extends Comparator<T> {
 
   /**
-   * Compare two objects in binary.
-   * b1[s1:l1] is the first object, and b2[s2:l2] is the second object.
-   * 
+   * Compare two objects in binary. b1[s1:l1] is the first object, and b2[s2:l2] is the second
+   * object.
    * @param b1 The first byte array.
    * @param s1 The position index in b1. The object under comparison's starting index.
    * @param l1 The length of the object in b1.

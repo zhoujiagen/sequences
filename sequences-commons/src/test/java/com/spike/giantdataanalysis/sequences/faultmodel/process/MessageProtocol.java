@@ -2,6 +2,7 @@ package com.spike.giantdataanalysis.sequences.faultmodel.process;
 
 class MessageProtocol {
 
+  @Deprecated
   static final byte MP_IS_PRIMARY = 0;
   static final byte MP_CHECK_POINT = 1;
 
@@ -11,6 +12,10 @@ class MessageProtocol {
 
   static final byte MP_TICKET_REQUEST = 126;
   static final byte MP_TICKET_RESPONSE = 127;
+
+  /** max duration of missing check point message for non-primary. */
+  static long MAX_DURATION_OF_MP_CHECK_POINT = 1000L;
+
 }
 
 class StateProtocol {

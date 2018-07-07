@@ -2,6 +2,7 @@ package com.spike.giantdataanalysis.sequences.faultmodel.process;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,20 +13,21 @@ import com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes;
 class Process {
   private static final Logger LOG = LoggerFactory.getLogger(Process.class);
 
-  int processId; // process id, i.e. the index in Processes
+  final int processId; // process id, i.e. the index in Processes
 
   final State initial; // initial state
-  State current; // current state
-  Message messageQueue; // input message queue
+  final State current; // current state
+  ConcurrentLinkedQueue<Message> messageQueue;
 
   // / environment information
   private Processes environment;
+  volatile boolean isPrimary = false;
 
   Process(int processId, State initial) {
     this.processId = processId;
     this.initial = initial;
     this.current = initial;
-    this.messageQueue = new Message(false);// new Message[Configuration.PROCESS_MESSAGE_SIZE];
+    messageQueue = new ConcurrentLinkedQueue<>();
   }
 
   void injectEnvironment(Processes processes) {
@@ -162,16 +164,23 @@ class Process {
       LOG.debug("{} start to pair execution", this.simpleToString());
     }
 
-    boolean isPrimary = false;
-
     long currentSequence = 0L;
 
     long end = (long) (new Date().getTime() + ProcessConfiguration.PROCESS_mttpf);
 
+    long lastCheckpointTime = -1L;
+
     while (true) {
-      if (new Date().getTime() > end) {
+      long now = new Date().getTime();
+      if (now > end) {
         LOG.info("{} encounter fault, DIE!!!", this.simpleToString());
         break;
+      }
+      // process take over
+      if (!isPrimary && lastCheckpointTime != -1
+          && now - lastCheckpointTime > MessageProtocol.MAX_DURATION_OF_MP_CHECK_POINT) {
+        LOG.info("{} start to takeover.", this.simpleToString());
+        environment.takeover(this);
       }
 
       byte[] inputMessage = new byte[ProcessConfiguration.MESSAGE_DATA_SIZE];
@@ -188,14 +197,14 @@ class Process {
 
       switch (protocol) {
 
-      case MessageProtocol.MP_IS_PRIMARY: {
-        isPrimary = true;
-        environment.primaryProcess = this;
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("{} is the primary!", this.simpleToString());
-        }
-        break;
-      }
+      // case MessageProtocol.MP_IS_PRIMARY: {
+      // isPrimary = true;
+      // environment.primaryProcess = this;
+      // if (LOG.isDebugEnabled()) {
+      // LOG.debug("{} is the primary!", this.simpleToString());
+      // }
+      // break;
+      // }
 
       case MessageProtocol.MP_CHECK_POINT: {
         if (isPrimary) {
@@ -208,6 +217,7 @@ class Process {
           if (LOG.isDebugEnabled()) {
             LOG.debug("{} receive checkpoint: {}", this.simpleToString(), currentSeq);
           }
+          lastCheckpointTime = now;
         }
         break;
       }
@@ -251,7 +261,8 @@ class Process {
   }
 
   void reset() {
-    this.current = this.initial;
+    current.program = initial.program;
+    current.data = initial.data;
   }
 
   /**
@@ -271,14 +282,12 @@ class Process {
    * @return
    */
   boolean message_get(byte[] value, boolean[] msgStatus) {
+    Message nextMessage = messageQueue.poll();
+    if (nextMessage == null) return false;
+    if (!nextMessage.status) return false;
 
-    Message head = messageQueue;
-    if (head == null || !head.status) return false;
-
-    System.arraycopy(head.value, 0, value, 0, ProcessConfiguration.MESSAGE_DATA_SIZE);
-    msgStatus[0] = head.status;
-
-    messageQueue = head.next;
+    System.arraycopy(nextMessage.value, 0, value, 0, ProcessConfiguration.MESSAGE_DATA_SIZE);
+    msgStatus[0] = nextMessage.status;
 
     return true;
   }
@@ -347,9 +356,8 @@ class State {
     // sb.append("State").append("\n");
     sb.append("\n");
     sb.append("\t").append("program=").append("\n");
-    Iterator<String> iter =
-        Splitter.fixedLength(ProcessConfiguration.DUMP_LINE_SIZE).split(MoreBytes.toHex(program))
-            .iterator();
+    Iterator<String> iter = Splitter.fixedLength(ProcessConfiguration.DUMP_LINE_SIZE)
+        .split(MoreBytes.toHex(program)).iterator();
     while (iter.hasNext()) {
       sb.append("\t").append(iter.next()).append("\n");
     }

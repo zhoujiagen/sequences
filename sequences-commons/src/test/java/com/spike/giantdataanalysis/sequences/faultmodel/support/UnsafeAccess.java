@@ -35,15 +35,16 @@ public final class UnsafeAccess {
       }
     });
 
-    if(theUnsafe != null){
+    if (theUnsafe != null) {
       BYTE_ARRAY_BASE_OFFSET = theUnsafe.arrayBaseOffset(byte[].class);
-    } else{
+    } else {
       BYTE_ARRAY_BASE_OFFSET = -1;
     }
   }
 
-  private UnsafeAccess(){}
+  private UnsafeAccess() {
+  }
 
-  public static final boolean littleEndian = ByteOrder.nativeOrder()
-      .equals(ByteOrder.LITTLE_ENDIAN);
+  public static final boolean littleEndian =
+      ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN);
 }

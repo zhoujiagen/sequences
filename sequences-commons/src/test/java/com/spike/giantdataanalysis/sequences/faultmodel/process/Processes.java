@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Maps;
 import com.spike.giantdataanalysis.sequences.faultmodel.store.StoreConfiguration;
 import com.spike.giantdataanalysis.sequences.faultmodel.store.Stores;
@@ -13,6 +16,7 @@ import com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes;
 // external behavior: store_read(), store_write(), message_send(), message_get()
 // ---------------------------------------------------------------------------
 public final class Processes {
+  private static final Logger LOG = LoggerFactory.getLogger(Processes.class);
 
   final Process[] processes = new Process[ProcessConfiguration.PROCESS_NUMBER];
   private final Random random = new Random(new Date().getTime());
@@ -176,13 +180,20 @@ public final class Processes {
     pair0.toPair();
     pair1.toPair();
 
-    byte[] message = new byte[ProcessConfiguration.MESSAGE_DATA_SIZE];
-    MoreBytes.putByte(message, 0, MessageProtocol.MP_IS_PRIMARY);
+    // byte[] message = new byte[ProcessConfiguration.MESSAGE_DATA_SIZE];
+    // MoreBytes.putByte(message, 0, MessageProtocol.MP_IS_PRIMARY);
     // pick one as the primary process
     if (random.nextBoolean()) {
-      message_send(firstProcessIndex, message);
+      // message_send(firstProcessIndex, message);
+      LOG.info("Process {} is the primary.", firstProcessIndex);
+      pair0.isPrimary = true;
+      primaryProcess = pair0;
+
     } else {
-      message_send(secondProcessIndex, message);
+      // message_send(secondProcessIndex, message);
+      LOG.info("Process {} is the primary.", secondProcessIndex);
+      pair1.isPrimary = true;
+      primaryProcess = pair1;
     }
 
     Thread pair0JavaThread = new Thread(new Runnable() {
@@ -203,6 +214,17 @@ public final class Processes {
     result[1] = pair1JavaThread;
 
     return result;
+  }
+
+  synchronized void takeover(Process sourceProcess) {
+    Integer targetProcessIndex = PAIR_MAP.get(sourceProcess.processId);
+    if (targetProcessIndex == null) return;
+    Process targetProcess = processes[targetProcessIndex];
+    if (targetProcess == null) return;
+
+    sourceProcess.isPrimary = true;
+    targetProcess.isPrimary = false;
+    primaryProcess = sourceProcess;
   }
 
   boolean message_send_to_pair(Process sourceProcess, byte[] value) {
@@ -228,9 +250,8 @@ public final class Processes {
     // mock message lost or disrupt
     if (random.nextDouble() < ProcessConfiguration.MESSAGE_pmf) return false;
 
-    Message head = process.messageQueue;
-    Message newHead = new Message(true, value, head);
-    process.messageQueue = newHead;
+    process.messageQueue.add(new Message(true, value));
+
     // mock duplicated message
     if (random.nextDouble() < ProcessConfiguration.MESSAGE_pmd) {
       do_message_send(process, value);

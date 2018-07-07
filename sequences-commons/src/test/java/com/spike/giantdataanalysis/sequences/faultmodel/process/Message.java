@@ -9,7 +9,7 @@ import com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes;
  * Message format
  * 
  * firt byte
- * 0      you are primary          
+ * 0      you are primary - no need now 20180707     
  * 1      checkpoint message
  * 2      regular kick off: retry times, total send times
  * ...      
@@ -26,7 +26,6 @@ class Message {
   }
 
   boolean status;
-  Message next; // for message queue
   byte[] value = new byte[ProcessConfiguration.MESSAGE_DATA_SIZE];
 
   Message() {
@@ -41,12 +40,6 @@ class Message {
     this.value = value;
   }
 
-  Message(boolean status, byte[] value, Message next) {
-    this.status = status;
-    this.value = value;
-    this.next = next;
-  }
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -54,10 +47,6 @@ class Message {
     sb.append("[").append(status);
     sb.append(", ").append(MoreBytes.toHex(value));
     sb.append("]");
-
-    if (next != null) {
-      sb.append("\n\t").append(next.toString());
-    }
 
     return sb.toString();
   }
