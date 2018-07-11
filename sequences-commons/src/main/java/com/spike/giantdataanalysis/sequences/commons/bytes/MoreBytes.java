@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.faultmodel.support;
+package com.spike.giantdataanalysis.sequences.commons.bytes;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes.LexicographicalComparerHolder.UnsafeComparer;
+import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes.LexicographicalComparerHolder.UnsafeComparer;
 
 import sun.misc.Unsafe;
 

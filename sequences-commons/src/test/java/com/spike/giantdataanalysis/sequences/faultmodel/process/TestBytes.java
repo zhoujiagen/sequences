@@ -1,6 +1,6 @@
 package com.spike.giantdataanalysis.sequences.faultmodel.process;
 
-import com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes;
+import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 
 // TODO(zhoujiagen) can we just support a byte message encoder/decoder
 public class TestBytes {

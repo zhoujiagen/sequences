@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.faultmodel.support;
+package com.spike.giantdataanalysis.sequences.commons.bytes;
 
 import java.util.Comparator;
 

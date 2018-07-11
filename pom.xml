@@ -17,6 +17,13 @@
 		<module>sequences-api-mysql</module>
 		<module>sequences-commons</module>
 		<module>sequences-server</module>
+
+		<!-- TM -->
+		<!--<module>sequences-tm</module>-->
+		<!--<module>sequences-tm-log</module>-->
+		<!-- RM: file -->
+		<module>sequences-rm-file</module>
+
 	</modules>
 
 	<licenses>

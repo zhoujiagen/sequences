@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.faultmodel.support;
+package com.spike.giantdataanalysis.sequences.commons.bytes;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
