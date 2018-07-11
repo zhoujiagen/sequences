@@ -1,7 +1,6 @@
 package com.spike.giantdataanalysis.sequences.rm.file.log;
 
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 import com.spike.giantdataanalysis.sequences.rm.file.ILM;
 import com.spike.giantdataanalysis.sequences.rm.file.core.AccessMode;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
@@ -15,29 +14,26 @@ public class TestDuplexingLogManager {
     configuration.directory2 = configuration.directory1;
     configuration.filePreix = "LOG";
     configuration.nameLength = 10;
+    configuration.logRecordSizeInOneFile = 2;
     ILM lm = new DuplexingLogManager(configuration);
 
-    
-    read(lm);
+    log_insert(lm);
 
-  }
-  
-  static void write_regular_file() {
-    
+    read(lm);
   }
 
   static void read(ILM lm) {
     lm.logtable_open(AccessMode.R);
 
+    LSN lsn = new LSN(LSN.NULL.file, 0L);
     OutParameter<LogRecord> header = new OutParameter<>();
-    lm.log_read_lsn(LSN.NULL, header, 0, null);
-    System.out.println(MoreBytes.toHex(header.value().toBytes()));
+    lm.log_read_lsn(lsn, header, 0, null);
+    System.out.println(header.value().asString());
 
     lm.logtable_close();
   }
 
   static void log_insert(ILM lm) {
-
     lm.logtable_open(AccessMode.A);
 
     int rmid = 1;
@@ -45,15 +41,15 @@ public class TestDuplexingLogManager {
     byte[] body = "Hello, there".getBytes();
     LSN lsn = null;
 
-    int N = 1000;
+    int N = 10;
     for (int i = 0; i < N; i++) {
       lsn = lm.log_insert(rmid, txnid1, body);
+      System.out.println(lsn.asString());
     }
 
     lm.log_flush(lsn, true);
 
     lm.logtable_close();
-
   }
 
 }

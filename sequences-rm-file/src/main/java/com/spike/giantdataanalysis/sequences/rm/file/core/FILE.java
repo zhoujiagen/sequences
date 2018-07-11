@@ -12,7 +12,8 @@ public class FILE {
   public FILE() {
   }
 
-  public FILE(String filename) {
+  public FILE(int fileno, String filename) {
+    this.fileno = fileno;
     this.filename = filename;
   }
 

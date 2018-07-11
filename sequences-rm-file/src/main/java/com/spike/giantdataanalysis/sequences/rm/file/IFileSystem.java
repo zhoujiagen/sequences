@@ -87,8 +87,7 @@ public interface IFileSystem {
   int read(FILE FILEID, int BLOCKID, OutParameter<FILEBlock> BLOCKP);
 
   int readLine(FILE FILEID, int BLOCKID, OutParameter<FILEBlock> BLOCKP);
-  
-  
+
   int readc(FILE FILEID, int BLOCKID, int blockcount, OutParameter<List<FILEBlock>> BLOCKP);
 
   // write from buffer in memeory to block in disk

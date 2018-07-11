@@ -18,6 +18,8 @@ public interface ILM {
     public IFileSystem fileSystem = new JavaFileSystem();
 
     public long lsnCacheThreshold = Long.MAX_VALUE;
+
+    public int logRecordSizeInOneFile = 10000;
   }
 
   class LogManagerException extends RuntimeException {

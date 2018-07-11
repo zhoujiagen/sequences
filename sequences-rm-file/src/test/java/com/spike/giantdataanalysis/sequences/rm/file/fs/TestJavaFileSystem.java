@@ -1,15 +1,9 @@
 package com.spike.giantdataanalysis.sequences.rm.file.fs;
 
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Date;
 
+import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
 import com.spike.giantdataanalysis.sequences.rm.file.core.AccessMode;
 import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
@@ -17,7 +11,6 @@ import com.spike.giantdataanalysis.sequences.rm.file.core.FILEBlock;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
 
-// FIXME(zhoujiagen) fix the byte write/read problem!!!
 public class TestJavaFileSystem {
 
   public static void main(String[] args) throws Exception {
@@ -25,11 +18,6 @@ public class TestJavaFileSystem {
   }
 
   static void write_log() throws Exception {
-
-    LogRecord nullLogRecord = LogRecord.NULL;
-    int size = nullLogRecord.size();
-    System.out.println("smallest LogRecord size: " + nullLogRecord.size());
-    System.out.println("smallest LogRecord: \n" + MoreBytes.toHex(nullLogRecord.toBytes()));
 
     IFileSystem fs = new JavaFileSystem();
 
@@ -42,6 +30,7 @@ public class TestJavaFileSystem {
     OUT_FILEID.setValue(FILEID);
     fs.open(filename, AccessMode.U, OUT_FILEID);
 
+    System.out.println("=== write");
     String content = "hello, there!";
     LogRecord logRecord = new LogRecord();
     logRecord.lsn = LSN.NULL;
@@ -52,42 +41,18 @@ public class TestJavaFileSystem {
     logRecord.txn_prev_lsn = LSN.NULL;
     logRecord.length = content.length();
     logRecord.body = content.getBytes();
-    System.out.println("logRecord: \n" + MoreBytes.toHex(logRecord.toBytes()));// toStringBinary
-    System.out.println("size of logRecord: " + logRecord.size());
 
-    System.err.println("contains new line ? "
-        + MoreBytes.contains(logRecord.toBytes(), System.lineSeparator().getBytes()));
-
-    System.out.println("=== write");
-    // OutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
-    // os.write(logRecord.toBytes());
-    // os.flush();
-    // os.close();
-    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
-    oos.write(logRecord.toBytes());
-    oos.writeUTF(System.lineSeparator());
-    oos.flush();
-    oos.close();
-
-    // FILEBlock BLOCKP = new FILEBlock();
-    // BLOCKP.contents = logRecord.toBytes();
-    // BLOCKP.contents = Bytes.concat(BLOCKP.contents, System.lineSeparator().getBytes());
-    // fs.write(FILEID, -1, BLOCKP);
+    FILEBlock BLOCKP = new FILEBlock();
+    BLOCKP.contents = logRecord.asString().getBytes();
+    BLOCKP.contents = Bytes.concat(BLOCKP.contents, System.lineSeparator().getBytes());
+    fs.write(FILEID, -2, BLOCKP);
 
     System.out.println("=== read again");
-    // BufferedReader reader = new BufferedReader(new FileReader(filename));
-    ObjectInputStream reader = new ObjectInputStream(new FileInputStream(filename));
-    String line = null;
-    while ((line = reader.readLine()) != null) {
-      System.out.println(line.length());
-      System.out.println(MoreBytes.toHex(line.getBytes()));
-
-      if (line.length() > size) {
-        System.err.println(nullLogRecord.fromBytes(line.getBytes()));
-      }
-    }
-    reader.close();
-
+    fs.close(FILEID);
+    fs.open(filename, AccessMode.R, OUT_FILEID);
+    OutParameter<FILEBlock> OUT_BLOCKP = new OutParameter<>();
+    fs.read(FILEID, -1, OUT_BLOCKP);
+    System.out.println(new String(OUT_BLOCKP.value().contents));
   }
 
   static void simple() {

@@ -1,9 +1,16 @@
 package com.spike.giantdataanalysis.sequences.rm.file.core.log;
 
-import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
-import com.spike.giantdataanalysis.sequences.rm.file.core.Byteable;
+import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.BEGIN;
+import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.END;
+import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.LONG_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.SEP;
 
-public class LSN implements Byteable<LSN> {
+import com.google.common.base.Strings;
+import com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable;
+
+public class LSN implements MoreSerializable.Stringable<LSN> {
+  private static final long serialVersionUID = 6268301188928797446L;
+
   // file no in directory
   // example: NNN => a_prefix.logaNNN, b_prefix.logbNNN
   public final long file;
@@ -16,25 +23,63 @@ public class LSN implements Byteable<LSN> {
 
   public static LSN NULL = new LSN(0, 0);
 
-  @Override
-  public byte[] toBytes() {
+  // ---------------------------------------------------------------------------
+  // Stringable
+  // ---------------------------------------------------------------------------
+  public static final String PREFIX = "LSN";
 
-    return MoreBytes.add(new byte[][] { MoreBytes.toBytes(file), MoreBytes.toBytes(rba) });
+  @Override
+  public String asString() {
+    return PREFIX + BEGIN //
+        + Strings.padStart(String.valueOf(file), LONG_MAX_STRING_LEN, '0') //
+        + SEP //
+        + Strings.padStart(String.valueOf(rba), LONG_MAX_STRING_LEN, '0')//
+        + END;
   }
 
   @Override
   public int size() {
-    return Long.SIZE / Byte.SIZE * 2;
+    return PREFIX.length() + BEGIN.length() //
+        + LONG_MAX_STRING_LEN //
+        + SEP.length()//
+        + LONG_MAX_STRING_LEN //
+        + END.length();
   }
 
   @Override
-  public LSN fromBytes(byte[] bytes) {
-    int offset = 0;
-    long file = MoreBytes.getLong(bytes, offset);
-    offset += Long.SIZE / Byte.SIZE;
-    long rba = MoreBytes.getLong(bytes, offset);
-    return new LSN(file, rba);
+  public LSN fromString(String raw) {
+
+    int start = PREFIX.length() + BEGIN.length();
+    int end = start + LONG_MAX_STRING_LEN;
+    long _file = Long.valueOf(raw.substring(start, end));
+    start = end + SEP.length();
+    end = start + LONG_MAX_STRING_LEN;
+    long _rba = Long.valueOf(raw.substring(start, end));
+    return new LSN(_file, _rba);
   }
+
+  // ---------------------------------------------------------------------------
+  // Byteable
+  // ---------------------------------------------------------------------------
+  // @Override
+  // public byte[] toBytes() {
+  //
+  // return MoreBytes.add(new byte[][] { MoreBytes.toBytes(file), MoreBytes.toBytes(rba) });
+  // }
+  //
+  // @Override
+  // public int size() {
+  // return Long.SIZE / Byte.SIZE * 2;
+  // }
+  //
+  // @Override
+  // public LSN fromBytes(byte[] bytes) {
+  // int offset = 0;
+  // long file = MoreBytes.getLong(bytes, offset);
+  // offset += Long.SIZE / Byte.SIZE;
+  // long rba = MoreBytes.getLong(bytes, offset);
+  // return new LSN(file, rba);
+  // }
 
   @Override
   public int hashCode() {

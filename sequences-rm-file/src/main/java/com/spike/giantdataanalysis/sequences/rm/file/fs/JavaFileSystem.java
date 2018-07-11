@@ -18,7 +18,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
 import com.spike.giantdataanalysis.sequences.rm.file.core.AccessMode;
 import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
@@ -86,13 +85,21 @@ public class JavaFileSystem implements IFileSystem {
     try {
       if (AccessMode.R.equals(accessMode)) {
 
-        readable.put(filename, Files.newBufferedReader(Paths.get(filename)));
+        readable.put(filename, Files.newBufferedReader(Paths.get(filename), Charsets.UTF_8));
 
       } else {
-        readable.put(filename, Files.newBufferedReader(Paths.get(filename)));
-        writable.put(filename, //
-          new InnerStreamMode(Files.newOutputStream(Paths.get(filename), StandardOpenOption.WRITE),
-              accessMode));
+        readable.put(filename, Files.newBufferedReader(Paths.get(filename), Charsets.UTF_8));
+        if (AccessMode.U.equals(accessMode)) {
+          writable.put(
+            filename,
+            new InnerStreamMode(
+                Files.newOutputStream(Paths.get(filename), StandardOpenOption.WRITE), accessMode));
+        } else if (AccessMode.A.equals(accessMode)) {
+          writable.put(
+            filename,
+            new InnerStreamMode(Files.newOutputStream(Paths.get(filename),
+              StandardOpenOption.WRITE, StandardOpenOption.APPEND), accessMode));
+        }
       }
     } catch (IOException e) {
       throw FileSystemException.newE(e);
@@ -182,7 +189,8 @@ public class JavaFileSystem implements IFileSystem {
       BLOCKP.setValue(fileBlock);
       while ((line = reader.readLine()) != null) {
         fileBlock.contents = Bytes.concat(fileBlock.contents, line.getBytes(Charsets.UTF_8));
-        return ReturnCode.FAIL.code();
+        BLOCKP.setValue(fileBlock);
+        return ReturnCode.OK.code();
       }
     } catch (IOException e) {
       throw FileSystemException.newE(e);
@@ -209,7 +217,7 @@ public class JavaFileSystem implements IFileSystem {
   @Override
   public int write(FILE FILEID, int BLOCKID, FILEBlock BLOCKP) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("write to file {}, content = {}", FILEID, MoreBytes.toHex(BLOCKP.contents));
+      LOG.debug("write to file {}, content = {}", FILEID, new String(BLOCKP.contents));
     }
 
     if (!writable.containsKey(FILEID.filename)) {

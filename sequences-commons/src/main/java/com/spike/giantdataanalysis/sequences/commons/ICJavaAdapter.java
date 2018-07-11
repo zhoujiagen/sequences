@@ -13,6 +13,13 @@ public interface ICJavaAdapter {
   public class OutParameter<T> {
     private T t;
 
+    public OutParameter() {
+    }
+
+    public OutParameter(T t) {
+      this.t = t;
+    }
+
     public void setValue(T t) {
       this.t = t;
     }
