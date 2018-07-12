@@ -1,7 +1,7 @@
 package com.spike.giantdataanalysis.sequences.rm.file;
 
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.core.AccessMode;
+import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.rm.file.fs.JavaFileSystem;
@@ -69,7 +69,7 @@ public interface ILM {
 
   }
 
-  boolean logtable_open(AccessMode accessMode);
+  boolean logtable_open(ACCESSMODE accessMode);
 
   void logtable_close();
 

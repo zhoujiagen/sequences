@@ -1,8 +1,8 @@
 package com.spike.giantdataanalysis.sequences.rm.file.core;
 
-public enum AccessMode {
+public enum ACCESSMODE {
   /** read */
-  R, //
+  R,
   /** update */
   U,
   /** append */

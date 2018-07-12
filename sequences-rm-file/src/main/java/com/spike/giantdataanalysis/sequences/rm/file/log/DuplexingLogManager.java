@@ -22,9 +22,9 @@ import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
 import com.spike.giantdataanalysis.sequences.rm.file.ILM;
-import com.spike.giantdataanalysis.sequences.rm.file.core.AccessMode;
+import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILEBlock;
+import com.spike.giantdataanalysis.sequences.rm.file.core.BLOCK;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogAnchor;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
@@ -44,6 +44,7 @@ public class DuplexingLogManager implements ILM {
   private Set<FILE> readable = Sets.newConcurrentHashSet();
   private Set<FILE> writable = Sets.newConcurrentHashSet();
 
+  // other log flush strategy???
   private final int logRecordSizeInOneFile;
   private volatile int currentLogRecordSize = 0;
   private final ReadWriteLock fileloopLock = new ReentrantReadWriteLock(true);
@@ -101,16 +102,15 @@ public class DuplexingLogManager implements ILM {
     lastA = Math.max(0, lastA - 1);
     lastB = Math.max(0, lastB - 1);
 
-    String logfile_a_name =
-        configuration.directory1 + filePreixA
-            + Strings.padStart(String.valueOf(lastA), configuration.nameLength, '0');
+    String logfile_a_name = configuration.directory1 + filePreixA
+        + Strings.padStart(String.valueOf(lastA), configuration.nameLength, '0');
     logfile_a = new FILE(lastA, logfile_a_name);
     File tempFile = new File(logfile_a_name);
     if (tempFile.exists()) {
-      fileSystem.open(logfile_a_name, AccessMode.A, new OutParameter<FILE>(new FILE()));
+      fileSystem.open(logfile_a_name, ACCESSMODE.A, new OutParameter<FILE>(new FILE()));
       // find last lsn to set current lsn
       LSN lsn = new LSN(logfile_a.fileno, 0);
-      OutParameter<FILEBlock> BLOCKP = new OutParameter<>(new FILEBlock());
+      OutParameter<BLOCK> BLOCKP = new OutParameter<>(new BLOCK());
       int res = fileSystem.readLine(logfile_a, 0, BLOCKP);
       while (IFileSystem.ReturnCode.OK.code() == res
           && (BLOCKP.value().contents != null || BLOCKP.value().contents.length != 0)) {
@@ -131,9 +131,8 @@ public class DuplexingLogManager implements ILM {
       }
     }
 
-    String logfile_b_name =
-        configuration.directory1 + filePreixB
-            + Strings.padStart(String.valueOf(lastB), configuration.nameLength, '0');
+    String logfile_b_name = configuration.directory1 + filePreixB
+        + Strings.padStart(String.valueOf(lastB), configuration.nameLength, '0');
     logfile_b = new FILE(lastB, logfile_b_name);
     tempFile = new File(logfile_b_name);
     if (!tempFile.exists()) {
@@ -143,12 +142,12 @@ public class DuplexingLogManager implements ILM {
         throw LogManagerException.newE(e);
       }
     }
-    fileSystem.open(logfile_b_name, AccessMode.A, new OutParameter<FILE>(new FILE()));
+    fileSystem.open(logfile_b_name, ACCESSMODE.A, new OutParameter<FILE>(new FILE()));
 
   }
 
   @Override
-  public boolean logtable_open(AccessMode accessMode) {
+  public boolean logtable_open(ACCESSMODE accessMode) {
     Preconditions.checkArgument(accessMode != null);
 
     OutParameter<FILE> a_FILEID = new OutParameter<>();
@@ -164,7 +163,7 @@ public class DuplexingLogManager implements ILM {
       throw LogManagerException.newE("cannot open inner files!");
     }
 
-    if (AccessMode.R.equals(accessMode)) {
+    if (ACCESSMODE.R.equals(accessMode)) {
       readable.add(logfile_a);
       readable.add(logfile_b);
     } else {
@@ -190,7 +189,7 @@ public class DuplexingLogManager implements ILM {
   @Override
   public long log_read_lsn(LSN lsn, OutParameter<LogRecord> header, long offset, byte[] buffer) {
 
-    OutParameter<FILEBlock> BLOCKP = new OutParameter<>();
+    OutParameter<BLOCK> BLOCKP = new OutParameter<>();
     int res = fileSystem.readLine(logfile_a, 0, BLOCKP);
     if (IFileSystem.ReturnCode.OK.code() != res) {
       throw LogManagerException.newE("read failed");
@@ -216,7 +215,7 @@ public class DuplexingLogManager implements ILM {
 
   @Override
   public long c_count(int rmid) {
-    if (!logtable_open(AccessMode.R)) panic();
+    if (!logtable_open(ACCESSMODE.R)) panic();
 
     long rec_count = 0;
 
@@ -257,7 +256,7 @@ public class DuplexingLogManager implements ILM {
 
     current_lsn_a = new LSN(current_lsn_a.file, logRecord.lsn.rba + current_lsn_a.size());
 
-    FILEBlock BLOCKP = new FILEBlock();
+    BLOCK BLOCKP = new BLOCK();
     BLOCKP.contents = logRecord.asString().getBytes();
     BLOCKP.contents = Bytes.concat(BLOCKP.contents, System.lineSeparator().getBytes());
     fileSystem.write(logfile_a, -1, BLOCKP);

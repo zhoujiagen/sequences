@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +20,9 @@ import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
-import com.spike.giantdataanalysis.sequences.rm.file.core.AccessMode;
+import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.rm.file.core.BLOCK;
 import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILEBlock;
 import com.spike.giantdataanalysis.sequences.rm.file.core.allocparmp;
 
 /**
@@ -31,14 +32,16 @@ public class JavaFileSystem implements IFileSystem {
 
   private static final Logger LOG = LoggerFactory.getLogger(JavaFileSystem.class);
 
-  private Map<String, BufferedReader> readable = Maps.newConcurrentMap();
-  private Map<String, InnerStreamMode> writable = Maps.newConcurrentMap();
+  private Map<FILE, BufferedReader> readable = Maps.newConcurrentMap();
+  private Map<FILE, InnerStreamMode> writable = Maps.newConcurrentMap();
+
+  private final AtomicInteger filenoSequence = new AtomicInteger(0);
 
   class InnerStreamMode {
     public OutputStream os;
-    public AccessMode mode;
+    public ACCESSMODE mode;
 
-    public InnerStreamMode(OutputStream os, AccessMode mode) {
+    public InnerStreamMode(OutputStream os, ACCESSMODE mode) {
       this.os = os;
       this.mode = mode;
     }
@@ -77,35 +80,33 @@ public class JavaFileSystem implements IFileSystem {
   }
 
   @Override
-  public int open(String filename, AccessMode accessMode, OutParameter<FILE> FILEID) {
+  public int open(String filename, ACCESSMODE accessMode, OutParameter<FILE> FILEID) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("open {} with mode: {}", filename, accessMode);
     }
 
-    try {
-      if (AccessMode.R.equals(accessMode)) {
+    FILEID.value().filename = filename;
+    FILEID.value().fileno = filenoSequence.getAndIncrement();
 
-        readable.put(filename, Files.newBufferedReader(Paths.get(filename), Charsets.UTF_8));
+    try {
+      if (ACCESSMODE.R.equals(accessMode)) {
+
+        readable.put(FILEID.value(), Files.newBufferedReader(Paths.get(filename), Charsets.UTF_8));
 
       } else {
-        readable.put(filename, Files.newBufferedReader(Paths.get(filename), Charsets.UTF_8));
-        if (AccessMode.U.equals(accessMode)) {
-          writable.put(
-            filename,
-            new InnerStreamMode(
-                Files.newOutputStream(Paths.get(filename), StandardOpenOption.WRITE), accessMode));
-        } else if (AccessMode.A.equals(accessMode)) {
-          writable.put(
-            filename,
-            new InnerStreamMode(Files.newOutputStream(Paths.get(filename),
-              StandardOpenOption.WRITE, StandardOpenOption.APPEND), accessMode));
+        readable.put(FILEID.value(), Files.newBufferedReader(Paths.get(filename), Charsets.UTF_8));
+        if (ACCESSMODE.U.equals(accessMode)) {
+          writable.put(FILEID.value(), new InnerStreamMode(
+              Files.newOutputStream(Paths.get(filename), StandardOpenOption.WRITE), accessMode));
+        } else if (ACCESSMODE.A.equals(accessMode)) {
+          writable.put(FILEID.value(),
+            new InnerStreamMode(Files.newOutputStream(Paths.get(filename), StandardOpenOption.WRITE,
+              StandardOpenOption.APPEND), accessMode));
         }
       }
     } catch (IOException e) {
       throw FileSystemException.newE(e);
     }
-
-    FILEID.value().filename = filename;
 
     return ReturnCode.OK.code();
   }
@@ -117,12 +118,12 @@ public class JavaFileSystem implements IFileSystem {
     }
 
     try {
-      BufferedReader r = readable.remove(FILEID.filename);
+      BufferedReader r = readable.remove(FILEID);
       if (r != null) {
         r.close();
       }
 
-      InnerStreamMode w = writable.remove(FILEID.filename);
+      InnerStreamMode w = writable.remove(FILEID);
       if (w != null && w.os != null) {
         w.os.close();
       }
@@ -144,19 +145,19 @@ public class JavaFileSystem implements IFileSystem {
    * @return
    */
   @Override
-  public int read(FILE FILEID, int BLOCKID, OutParameter<FILEBlock> BLOCKP) {
+  public int read(FILE FILEID, int BLOCKID, OutParameter<BLOCK> BLOCKP) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("read file {}", FILEID);
     }
 
-    if (!readable.containsKey(FILEID.filename)) {
+    if (!readable.containsKey(FILEID)) {
       throw FileSystemException.newE("file not opened!");
     }
 
-    FILEBlock fileBlock = new FILEBlock();
+    BLOCK fileBlock = new BLOCK();
     try {
 
-      BufferedReader reader = readable.get(FILEID.filename);
+      BufferedReader reader = readable.get(FILEID);
       String line = null;
       fileBlock.contents = new byte[0];
       while ((line = reader.readLine()) != null) {
@@ -170,20 +171,20 @@ public class JavaFileSystem implements IFileSystem {
   }
 
   @Override
-  public int readLine(FILE FILEID, int BLOCKID, OutParameter<FILEBlock> BLOCKP) {
+  public int readLine(FILE FILEID, int BLOCKID, OutParameter<BLOCK> BLOCKP) {
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("read file next line {}", FILEID);
     }
 
-    if (!readable.containsKey(FILEID.filename)) {
+    if (!readable.containsKey(FILEID)) {
       throw FileSystemException.newE("file not opened!");
     }
 
-    FILEBlock fileBlock = new FILEBlock();
+    BLOCK fileBlock = new BLOCK();
     try {
 
-      BufferedReader reader = readable.get(FILEID.filename);
+      BufferedReader reader = readable.get(FILEID);
       String line = null;
       fileBlock.contents = new byte[0];
       BLOCKP.setValue(fileBlock);
@@ -201,8 +202,8 @@ public class JavaFileSystem implements IFileSystem {
   }
 
   @Override
-  public int readc(FILE FILEID, int BLOCKID, int blockcount, OutParameter<List<FILEBlock>> BLOCKP) {
-    OutParameter<FILEBlock> _BLOCKP = new OutParameter<FILEBlock>();
+  public int readc(FILE FILEID, int BLOCKID, int blockcount, OutParameter<List<BLOCK>> BLOCKP) {
+    OutParameter<BLOCK> _BLOCKP = new OutParameter<BLOCK>();
     int result = read(FILEID, BLOCKID, _BLOCKP);
     BLOCKP.setValue(Lists.newArrayList(_BLOCKP.value()));
     return result;
@@ -215,19 +216,19 @@ public class JavaFileSystem implements IFileSystem {
    * @return
    */
   @Override
-  public int write(FILE FILEID, int BLOCKID, FILEBlock BLOCKP) {
+  public int write(FILE FILEID, int BLOCKID, BLOCK BLOCKP) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("write to file {}, content = {}", FILEID, new String(BLOCKP.contents));
     }
 
-    if (!writable.containsKey(FILEID.filename)) {
+    if (!writable.containsKey(FILEID)) {
       throw FileSystemException.newE("cannot write to " + FILEID);
     }
 
     if (BLOCKID == -1) {
       try {
-        InnerStreamMode streamMode = writable.get(FILEID.filename);
-        if (!AccessMode.A.equals(streamMode.mode)) {
+        InnerStreamMode streamMode = writable.get(FILEID);
+        if (!ACCESSMODE.A.equals(streamMode.mode)) {
           throw FileSystemException.newE("invalid operation, can only " + streamMode.mode);
         }
         streamMode.os.write(BLOCKP.contents);
@@ -237,8 +238,8 @@ public class JavaFileSystem implements IFileSystem {
       }
     } else if (BLOCKID == -2) {
       try {
-        InnerStreamMode streamMode = writable.get(FILEID.filename);
-        if (!AccessMode.U.equals(streamMode.mode)) {
+        InnerStreamMode streamMode = writable.get(FILEID);
+        if (!ACCESSMODE.U.equals(streamMode.mode)) {
           throw FileSystemException.newE("invalid operation, can only " + streamMode.mode);
         }
         streamMode.os.write(BLOCKP.contents);
@@ -252,7 +253,7 @@ public class JavaFileSystem implements IFileSystem {
   }
 
   @Override
-  public int writec(FILE FILEID, int BLOCKID, FILEBlock BLOCKP) {
+  public int writec(FILE FILEID, int BLOCKID, BLOCK BLOCKP) {
     return write(FILEID, BLOCKID, BLOCKP);
   }
 
@@ -262,7 +263,7 @@ public class JavaFileSystem implements IFileSystem {
       LOG.debug("flush file {}, ", FILEID);
     }
 
-    InnerStreamMode streamMode = writable.get(FILEID.filename);
+    InnerStreamMode streamMode = writable.get(FILEID);
     if (streamMode == null) {
       throw FileSystemException.newE("not exist write handle to " + FILEID.filename);
     }

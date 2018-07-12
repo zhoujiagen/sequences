@@ -1,6 +1,6 @@
 package com.spike.giantdataanalysis.sequences.rm.file.core;
 
-public enum PageState {
+public enum PAGE_STATE {
   VALID, //
   INVALID, //
   INDOUBT, //

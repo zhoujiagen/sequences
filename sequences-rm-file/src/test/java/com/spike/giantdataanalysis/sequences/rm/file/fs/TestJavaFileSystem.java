@@ -5,9 +5,9 @@ import java.util.Date;
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
-import com.spike.giantdataanalysis.sequences.rm.file.core.AccessMode;
+import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILEBlock;
+import com.spike.giantdataanalysis.sequences.rm.file.core.BLOCK;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
 
@@ -28,7 +28,7 @@ public class TestJavaFileSystem {
     OutParameter<FILE> OUT_FILEID = new OutParameter<>();
     FILE FILEID = new FILE();
     OUT_FILEID.setValue(FILEID);
-    fs.open(filename, AccessMode.U, OUT_FILEID);
+    fs.open(filename, ACCESSMODE.U, OUT_FILEID);
 
     System.out.println("=== write");
     String content = "hello, there!";
@@ -42,15 +42,15 @@ public class TestJavaFileSystem {
     logRecord.length = content.length();
     logRecord.body = content.getBytes();
 
-    FILEBlock BLOCKP = new FILEBlock();
+    BLOCK BLOCKP = new BLOCK();
     BLOCKP.contents = logRecord.asString().getBytes();
     BLOCKP.contents = Bytes.concat(BLOCKP.contents, System.lineSeparator().getBytes());
     fs.write(FILEID, -2, BLOCKP);
 
     System.out.println("=== read again");
     fs.close(FILEID);
-    fs.open(filename, AccessMode.R, OUT_FILEID);
-    OutParameter<FILEBlock> OUT_BLOCKP = new OutParameter<>();
+    fs.open(filename, ACCESSMODE.R, OUT_FILEID);
+    OutParameter<BLOCK> OUT_BLOCKP = new OutParameter<>();
     fs.read(FILEID, -1, OUT_BLOCKP);
     System.out.println(new String(OUT_BLOCKP.value().contents));
   }
@@ -66,9 +66,9 @@ public class TestJavaFileSystem {
     OutParameter<FILE> OUT_FILEID = new OutParameter<>();
     FILE FILEID = new FILE();
     OUT_FILEID.setValue(FILEID);
-    fs.open(filename, AccessMode.U, OUT_FILEID);
+    fs.open(filename, ACCESSMODE.U, OUT_FILEID);
 
-    FILEBlock BLOCKP = new FILEBlock();
+    BLOCK BLOCKP = new BLOCK();
     BLOCKP.contents = new String("hello, there!").getBytes();
     fs.write(FILEID, -1, BLOCKP);
 
