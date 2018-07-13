@@ -19,16 +19,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
+import com.spike.giantdataanalysis.sequences.rm.file.IFS;
 import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.BLOCK;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.allocparmp;
+import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
+import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
+import com.spike.giantdataanalysis.sequences.rm.file.exception.FileSystemException;
 
 /**
  * File System implemented in Java: just a demonstration.
  */
-public class JavaFileSystem implements IFileSystem {
+public class JavaFileSystem implements IFS {
 
   private static final Logger LOG = LoggerFactory.getLogger(JavaFileSystem.class);
 
@@ -37,7 +38,7 @@ public class JavaFileSystem implements IFileSystem {
 
   private final AtomicInteger filenoSequence = new AtomicInteger(0);
 
-  class InnerStreamMode {
+  private class InnerStreamMode {
     public OutputStream os;
     public ACCESSMODE mode;
 
@@ -134,7 +135,7 @@ public class JavaFileSystem implements IFileSystem {
   }
 
   @Override
-  public int extend(FILE FILEID, int allocparmp) {
+  public int extend(FILE FILEID, allocparmp allocparmp) {
     throw FileSystemException.newE(new UnsupportedOperationException());
   }
 

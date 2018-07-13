@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.rm.file.core;
+package com.spike.giantdataanalysis.sequences.rm.file.support;
 
 import java.io.Serializable;
 
@@ -6,7 +6,7 @@ public interface MoreSerializable {
 
   int BOOLEAN_MAX_STRING_LEN = Math.max(//
     String.valueOf(Boolean.TRUE).length(), String.valueOf(Boolean.FALSE).length());
-  int Byte_MAX_STRING_LEN = Math.max(//
+  int BYTE_MAX_STRING_LEN = Math.max(//
     String.valueOf(Byte.MAX_VALUE).length(), String.valueOf(Byte.MIN_VALUE).length());
   int CHARACTER_MAX_STRING_LEN = Math.max(//
     String.valueOf(Character.MAX_VALUE).length(), String.valueOf(Character.MIN_VALUE).length());
@@ -21,7 +21,12 @@ public interface MoreSerializable {
   int DOUBLE_MAX_STRING_LEN = Math.max(//
     String.valueOf(Double.MAX_VALUE).length(), String.valueOf(Double.MIN_VALUE).length());
 
+  // TODO(zhoujiagen) when used in nested, its rather complicated!!!
+
+  String ARRAY_JOIN_SEP = ",";
+  char PAD_NUMBER = '0';
   String SEP = ".|.";
+  String SEP_LIST = "..|..";
   String BEGIN = "[[";
   String END = "]]";
 
@@ -41,5 +46,19 @@ public interface MoreSerializable {
     int size();
 
     T fromString(String raw);
+  }
+
+  class Ops {
+    public static String[] to(long[] longs) {
+      int len = longs.length;
+      if (len == 0) {
+        return new String[0];
+      }
+      String[] result = new String[len];
+      for (int i = 0; i < len; i++) {
+        result[i] = String.valueOf(longs[i]);
+      }
+      return result;
+    }
   }
 }

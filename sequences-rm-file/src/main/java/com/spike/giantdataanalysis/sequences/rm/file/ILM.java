@@ -15,58 +15,11 @@ public interface ILM {
     public String directory2;
     public String filePreix = "LOG";
     public int nameLength = 10;
-    public IFileSystem fileSystem = new JavaFileSystem();
+    public IFS fileSystem = new JavaFileSystem();
 
     public long lsnCacheThreshold = Long.MAX_VALUE;
 
     public int logRecordSizeInOneFile = 10000;
-  }
-
-  class LogManagerException extends RuntimeException {
-    private static final long serialVersionUID = 5225858589672335027L;
-
-    public static LogManagerException newE() {
-      return new LogManagerException();
-    }
-
-    public static LogManagerException newE(String message) {
-      return new LogManagerException(message);
-    }
-
-    public static LogManagerException newE(String message, Throwable cause) {
-      return new LogManagerException(message, cause);
-    }
-
-    public static LogManagerException newE(Throwable cause) {
-      return new LogManagerException(cause);
-    }
-
-    public static LogManagerException newE(String message, Throwable cause,
-        boolean enableSuppression, boolean writableStackTrace) {
-      return new LogManagerException(message, cause, enableSuppression, writableStackTrace);
-    }
-
-    public LogManagerException() {
-      super();
-    }
-
-    public LogManagerException(String message) {
-      super(message);
-    }
-
-    public LogManagerException(String message, Throwable cause) {
-      super(message, cause);
-    }
-
-    public LogManagerException(Throwable cause) {
-      super(cause);
-    }
-
-    public LogManagerException(String message, Throwable cause, boolean enableSuppression,
-        boolean writableStackTrace) {
-      super(message, cause, enableSuppression, writableStackTrace);
-    }
-
   }
 
   boolean logtable_open(ACCESSMODE accessMode);

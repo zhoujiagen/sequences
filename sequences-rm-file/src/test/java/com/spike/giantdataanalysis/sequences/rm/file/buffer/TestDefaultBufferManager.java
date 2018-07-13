@@ -1,15 +1,15 @@
 package com.spike.giantdataanalysis.sequences.rm.file.buffer;
 
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.IBufferManager;
-import com.spike.giantdataanalysis.sequences.rm.file.IBufferManager.BUFFER_ACC_CB;
-import com.spike.giantdataanalysis.sequences.rm.file.core.PAGEID;
-import com.spike.giantdataanalysis.sequences.rm.file.core.PAGE_TYPE;
+import com.spike.giantdataanalysis.sequences.rm.file.IBM;
+import com.spike.giantdataanalysis.sequences.rm.file.IBM.BUFFER_ACC_CB;
+import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGEID;
+import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGE_TYPE;
 
-public class TestDefaultBuffer {
+public class TestDefaultBufferManager {
   public static void main(String[] args) {
 
-    IBufferManager buffer = new DefaultBufferManager();
+    IBM buffer = new DefaultBufferManager();
 
     PAGEID pageid = new PAGEID(0, 0, PAGE_TYPE.DATA);
     int lock_mode = -1;

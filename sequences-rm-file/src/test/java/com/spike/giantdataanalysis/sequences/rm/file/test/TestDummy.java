@@ -2,12 +2,28 @@ package com.spike.giantdataanalysis.sequences.rm.file.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.Paths;
 import java.util.Date;
 
 public class TestDummy {
   public static void main(String[] args) throws Exception {
-    file();
+    raf();
+  }
+
+  static void raf() throws IOException {
+    RandomAccessFile raf = new RandomAccessFile("target/raf.txt", "rwd");
+    long pos = 0;
+    raf.seek(pos);
+
+    String line = "hello, there!";
+    raf.writeBytes(line);
+
+    pos = line.length() - 2;
+    raf.seek(pos);
+    raf.writeBytes("E!");
+
+    raf.close();
   }
 
   static void file() throws IOException {

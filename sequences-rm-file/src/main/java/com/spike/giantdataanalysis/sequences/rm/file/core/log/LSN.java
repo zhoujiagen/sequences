@@ -1,12 +1,12 @@
 package com.spike.giantdataanalysis.sequences.rm.file.core.log;
 
-import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.BEGIN;
-import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.END;
-import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.LONG_MAX_STRING_LEN;
-import static com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable.SEP;
+import static com.spike.giantdataanalysis.sequences.rm.file.support.MoreSerializable.BEGIN;
+import static com.spike.giantdataanalysis.sequences.rm.file.support.MoreSerializable.END;
+import static com.spike.giantdataanalysis.sequences.rm.file.support.MoreSerializable.LONG_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.sequences.rm.file.support.MoreSerializable.SEP;
 
 import com.google.common.base.Strings;
-import com.spike.giantdataanalysis.sequences.rm.file.core.MoreSerializable;
+import com.spike.giantdataanalysis.sequences.rm.file.support.MoreSerializable;
 
 public class LSN implements MoreSerializable.Stringable<LSN> {
   private static final long serialVersionUID = 6268301188928797446L;

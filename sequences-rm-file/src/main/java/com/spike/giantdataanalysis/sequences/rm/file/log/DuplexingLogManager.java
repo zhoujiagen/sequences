@@ -20,14 +20,15 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
+import com.spike.giantdataanalysis.sequences.rm.file.IFS;
 import com.spike.giantdataanalysis.sequences.rm.file.ILM;
 import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.BLOCK;
+import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
+import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogAnchor;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
+import com.spike.giantdataanalysis.sequences.rm.file.exception.LogManagerException;
 
 /**
  * Duplexing log manager.
@@ -40,7 +41,7 @@ public class DuplexingLogManager implements ILM {
   private volatile FILE logfile_a;
   private volatile LSN current_lsn_a = LSN.NULL;
   private volatile FILE logfile_b;
-  private final IFileSystem fileSystem;
+  private final IFS fileSystem;
   private Set<FILE> readable = Sets.newConcurrentHashSet();
   private Set<FILE> writable = Sets.newConcurrentHashSet();
 
@@ -112,7 +113,7 @@ public class DuplexingLogManager implements ILM {
       LSN lsn = new LSN(logfile_a.fileno, 0);
       OutParameter<BLOCK> BLOCKP = new OutParameter<>(new BLOCK());
       int res = fileSystem.readLine(logfile_a, 0, BLOCKP);
-      while (IFileSystem.ReturnCode.OK.code() == res
+      while (IFS.ReturnCode.OK.code() == res
           && (BLOCKP.value().contents != null || BLOCKP.value().contents.length != 0)) {
         String contentsString = new String(BLOCKP.value().contents);
         if (LOG.isDebugEnabled()) {
@@ -153,13 +154,13 @@ public class DuplexingLogManager implements ILM {
     OutParameter<FILE> a_FILEID = new OutParameter<>();
     a_FILEID.setValue(logfile_a);
     int resa = fileSystem.open(logfile_a.filename, accessMode, a_FILEID);
-    if (IFileSystem.ReturnCode.OK.code() != resa) {
+    if (IFS.ReturnCode.OK.code() != resa) {
       throw LogManagerException.newE("cannot open inner files!");
     }
     OutParameter<FILE> b_FILEID = new OutParameter<>();
     b_FILEID.setValue(logfile_b);
     int resb = fileSystem.open(logfile_b.filename, accessMode, b_FILEID);
-    if (IFileSystem.ReturnCode.OK.code() != resb) {
+    if (IFS.ReturnCode.OK.code() != resb) {
       throw LogManagerException.newE("cannot open inner files!");
     }
 
@@ -191,7 +192,7 @@ public class DuplexingLogManager implements ILM {
 
     OutParameter<BLOCK> BLOCKP = new OutParameter<>();
     int res = fileSystem.readLine(logfile_a, 0, BLOCKP);
-    if (IFileSystem.ReturnCode.OK.code() != res) {
+    if (IFS.ReturnCode.OK.code() != res) {
       throw LogManagerException.newE("read failed");
     }
     LogRecord logRecord = LogRecord.NULL;

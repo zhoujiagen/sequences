@@ -2,6 +2,8 @@ package com.spike.giantdataanalysis.sequences.rm.file.config;
 
 public interface FileConfiguration {
 
+  // disk
+  
   /// block
   int BLOCK_DATA_SIZE = 8192; // 8KB
 

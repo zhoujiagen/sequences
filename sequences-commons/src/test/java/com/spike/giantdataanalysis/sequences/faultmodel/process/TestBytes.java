@@ -2,7 +2,8 @@ package com.spike.giantdataanalysis.sequences.faultmodel.process;
 
 import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 
-// TODO(zhoujiagen) can we just support a byte message encoder/decoder
+// can we just support a byte message encoder/decoder???
+// now we have Stringable representation. - 20180713
 public class TestBytes {
 
   public static void main(String[] args) {

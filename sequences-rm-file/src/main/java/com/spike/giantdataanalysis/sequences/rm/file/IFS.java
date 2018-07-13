@@ -4,62 +4,35 @@ import java.util.List;
 
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.BLOCK;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.allocparmp;
+import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
+import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
 
 /**
  * File System.
+ * <p>
+ * Note that
+ * <ul>
+ * <li><code>filename</code> should be unique in file system
+ * <li><code>FILEID</code> is just a file handle used after calling
+ * {@link #open(String, ACCESSMODE, OutParameter)}
+ * <li><code>FILENO</code>/<code>fileno</code> is matained by file system
  */
-public interface IFileSystem {
+public interface IFS {
 
-  class FileSystemException extends RuntimeException {
-    private static final long serialVersionUID = 5225858589672335027L;
-
-    public static FileSystemException newE() {
-      return new FileSystemException();
-    }
-
-    public static FileSystemException newE(String message) {
-      return new FileSystemException(message);
-    }
-
-    public static FileSystemException newE(String message, Throwable cause) {
-      return new FileSystemException(message, cause);
-    }
-
-    public static FileSystemException newE(Throwable cause) {
-      return new FileSystemException(cause);
-    }
-
-    public static FileSystemException newE(String message, Throwable cause,
-        boolean enableSuppression, boolean writableStackTrace) {
-      return new FileSystemException(message, cause, enableSuppression, writableStackTrace);
-    }
-
-    public FileSystemException() {
-      super();
-    }
-
-    public FileSystemException(String message) {
-      super(message);
-    }
-
-    public FileSystemException(String message, Throwable cause) {
-      super(message, cause);
-    }
-
-    public FileSystemException(Throwable cause) {
-      super(cause);
-    }
-
-    public FileSystemException(String message, Throwable cause, boolean enableSuppression,
-        boolean writableStackTrace) {
-      super(message, cause, enableSuppression, writableStackTrace);
-    }
-
+  class Configuration {
+    public CatalogConfiguration catalogConfiguration;
   }
-
+  
+  
+  class CatalogConfiguration {
+    public String catalogDir = "target/catalog/";
+    public String storeFilePreix = "STORE-";
+    public String fileDescriptorFilePrefix = "FD-";
+    public int nameLength = 10;
+  }
+  
+  
   enum ReturnCode {
     OK(0), FAIL(1);
     private int code;
@@ -75,7 +48,7 @@ public interface IFileSystem {
 
   /**
    * create and allocate file.
-   * @param filename
+   * @param filename should be unique in file system
    * @param allocparmp
    * @return
    */
@@ -83,14 +56,14 @@ public interface IFileSystem {
 
   /**
    * delete and deallocate file.
-   * @param filename
+   * @param filename should be unique in file system
    * @return
    */
   int delete(String filename);
 
   /**
    * open a file with access mode.
-   * @param filename
+   * @param filename should be unique in file system
    * @param accessMode
    * @param FILEID
    * @return
@@ -110,7 +83,7 @@ public interface IFileSystem {
    * @param allocparmp
    * @return
    */
-  int extend(FILE FILEID, int allocparmp);
+  int extend(FILE FILEID, allocparmp allocparmp);
 
   /**
    * read block in disk to buffer in memeory.

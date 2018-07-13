@@ -4,10 +4,10 @@ import java.util.Date;
 
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.IFileSystem;
+import com.spike.giantdataanalysis.sequences.rm.file.IFS;
 import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.BLOCK;
+import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
+import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
 
@@ -19,7 +19,7 @@ public class TestJavaFileSystem {
 
   static void write_log() throws Exception {
 
-    IFileSystem fs = new JavaFileSystem();
+    IFS fs = new JavaFileSystem();
 
     String base = "target/";
     String filename = base + "hello.txt";
@@ -57,7 +57,7 @@ public class TestJavaFileSystem {
 
   static void simple() {
 
-    IFileSystem fs = new JavaFileSystem();
+    IFS fs = new JavaFileSystem();
 
     String base = "target/";
     String filename = base + "hello.txt";

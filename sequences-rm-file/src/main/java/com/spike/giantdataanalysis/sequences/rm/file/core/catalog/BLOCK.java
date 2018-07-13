@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.rm.file.core;
+package com.spike.giantdataanalysis.sequences.rm.file.core.catalog;
 
 public final class BLOCK {
 

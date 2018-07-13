@@ -3,18 +3,16 @@ package com.spike.giantdataanalysis.sequences.rm.file;
 import java.util.concurrent.Semaphore;
 
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.core.PAGEID;
+import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGEID;
 
 /**
- * The buffer: fix pages, unfix pages, flush pages.
+ * Buffer Manager: fix pages, unfix pages, flush pages.
  * <p>
  * Use the FIX_USER_UNFIX protocol.
  */
-public interface IBufferManager {
+public interface IBM {
 
-  /**
-   * Buffer Access Control Block.
-   */
+  /** Buffer Access Control Block. */
   class BUFFER_ACC_CB {
     public int pageid; // PAGEID: page id in file
     public int pageaddr;// PAGEPTR: page base address in buffer pool, setted by buffer manager

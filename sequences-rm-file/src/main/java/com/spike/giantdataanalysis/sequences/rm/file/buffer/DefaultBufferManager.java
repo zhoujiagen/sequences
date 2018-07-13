@@ -3,14 +3,14 @@ package com.spike.giantdataanalysis.sequences.rm.file.buffer;
 import java.util.concurrent.Semaphore;
 
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.IBufferManager;
+import com.spike.giantdataanalysis.sequences.rm.file.IBM;
 import com.spike.giantdataanalysis.sequences.rm.file.config.FileConfiguration;
-import com.spike.giantdataanalysis.sequences.rm.file.core.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.PAGEID;
-import com.spike.giantdataanalysis.sequences.rm.file.core.PAGE_HEADER;
+import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
+import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGEID;
+import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGE_HEADER;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 
-public class DefaultBufferManager implements IBufferManager {
+public class DefaultBufferManager implements IBM {
 
   // FIXME(zhoujiagen) well, it's rather complicated here!!!
   // ---------------------------------------------------------------------------
