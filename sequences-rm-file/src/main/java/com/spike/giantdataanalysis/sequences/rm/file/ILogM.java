@@ -9,7 +9,7 @@ import com.spike.giantdataanalysis.sequences.rm.file.fs.JavaFileSystem;
 /**
  * Log manager.
  */
-public interface ILM {
+public interface ILogM {
   class Configuration {
     public String directory1;
     public String directory2;

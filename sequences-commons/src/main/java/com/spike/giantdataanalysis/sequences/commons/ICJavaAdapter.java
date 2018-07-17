@@ -28,4 +28,29 @@ public interface ICJavaAdapter {
       return t;
     }
   }
+
+  // pointer
+  public class CPointer<T> {
+    protected T value;
+
+    public CPointer() {
+    }
+
+    public CPointer(T value) {
+      this.value = value;
+    }
+
+    public static <T> CPointer<T> of(T value) {
+      return new CPointer<>(value);
+    }
+
+    public T value() {
+      return this.value;
+    }
+
+    public void value(T value) {
+      this.value = value;
+    }
+  }
+
 }

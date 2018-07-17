@@ -1,7 +1,7 @@
 package com.spike.giantdataanalysis.sequences.rm.file.log;
 
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.ILM;
+import com.spike.giantdataanalysis.sequences.rm.file.ILogM;
 import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
@@ -9,20 +9,20 @@ import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
 public class TestDuplexingLogManager {
   public static void main(String[] args) {
 
-    ILM.Configuration configuration = new ILM.Configuration();
+    ILogM.Configuration configuration = new ILogM.Configuration();
     configuration.directory1 = "target/";
     configuration.directory2 = configuration.directory1;
     configuration.filePreix = "LOG";
     configuration.nameLength = 10;
     configuration.logRecordSizeInOneFile = 2;
-    ILM lm = new DuplexingLogManager(configuration);
+    ILogM lm = new DuplexingLogManager(configuration);
 
     log_insert(lm);
 
     read(lm);
   }
 
-  static void read(ILM lm) {
+  static void read(ILogM lm) {
     lm.logtable_open(ACCESSMODE.R);
 
     LSN lsn = new LSN(LSN.NULL.file, 0L);
@@ -33,7 +33,7 @@ public class TestDuplexingLogManager {
     lm.logtable_close();
   }
 
-  static void log_insert(ILM lm) {
+  static void log_insert(ILogM lm) {
     lm.logtable_open(ACCESSMODE.A);
 
     int rmid = 1;

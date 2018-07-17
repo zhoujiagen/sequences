@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IFS;
-import com.spike.giantdataanalysis.sequences.rm.file.ILM;
+import com.spike.giantdataanalysis.sequences.rm.file.ILogM;
 import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
 import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
@@ -33,7 +33,7 @@ import com.spike.giantdataanalysis.sequences.rm.file.exception.LogManagerExcepti
 /**
  * Duplexing log manager.
  */
-public class DuplexingLogManager implements ILM {
+public class DuplexingLogManager implements ILogM {
   private static final Logger LOG = LoggerFactory.getLogger(DuplexingLogManager.class);
 
   private final Configuration configuration;

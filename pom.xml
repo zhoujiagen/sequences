@@ -18,6 +18,9 @@
 		<module>sequences-commons</module>
 		<module>sequences-server</module>
 
+		<!-- txn: TM, Lock -->
+		<module>sequences-txn</module>
+
 		<!-- TM -->
 		<!--<module>sequences-tm</module>-->
 		<!--<module>sequences-tm-log</module>-->

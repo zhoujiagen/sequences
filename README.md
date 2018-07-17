@@ -54,4 +54,12 @@ Sequences
 + DSL: SQL?
 + storage: format, partition and replica
 + daemon with active-standby: gossip and coordination
-+ anagement utilities: system status and metric
++ management utilities: system status and metric
+
+### Components
+
++ Lock Manager
++ Log Manager
++ Transaction Manager
++ File Manager: Catalog, Buffer Manager, Tuple/Index Organization
+
