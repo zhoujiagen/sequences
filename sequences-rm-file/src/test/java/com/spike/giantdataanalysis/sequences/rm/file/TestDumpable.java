@@ -1,7 +1,7 @@
 package com.spike.giantdataanalysis.sequences.rm.file;
 
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.DISK;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.STORE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.DISK;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.STORE;
 
 public class TestDumpable {
 

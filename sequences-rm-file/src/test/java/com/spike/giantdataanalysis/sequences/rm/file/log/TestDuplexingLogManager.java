@@ -1,10 +1,10 @@
 package com.spike.giantdataanalysis.sequences.rm.file.log;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
+import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.ILogM;
-import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
 
 public class TestDuplexingLogManager {
   public static void main(String[] args) {

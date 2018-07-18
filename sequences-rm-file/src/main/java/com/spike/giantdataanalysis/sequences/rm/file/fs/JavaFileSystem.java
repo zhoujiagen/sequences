@@ -18,13 +18,13 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.core.file.allocparmp;
+import com.spike.giantdataanalysis.sequences.core.file.file.FILE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.BLOCK;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.exception.FileSystemException;
 import com.spike.giantdataanalysis.sequences.rm.file.IFS;
-import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.allocparmp;
-import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
-import com.spike.giantdataanalysis.sequences.rm.file.exception.FileSystemException;
 
 /**
  * File System implemented in Java: just a demonstration.

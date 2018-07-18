@@ -1,8 +1,8 @@
 package com.spike.giantdataanalysis.sequences.locking;
 
-import com.spike.giantdataanalysis.sequences.commons.NativeOps;
-import com.spike.giantdataanalysis.sequences.locking.core.PCB;
-import com.spike.giantdataanalysis.sequences.locking.core.xsemaphore;
+import com.spike.giantdataanalysis.sequences.core.locking.PCB;
+import com.spike.giantdataanalysis.sequences.core.locking.xsemaphore;
+import com.spike.giantdataanalysis.sequences.core.support.NativeOps;
 
 public class DefaultXSemaphore implements IXSem {
 

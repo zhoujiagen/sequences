@@ -3,13 +3,13 @@ package com.spike.giantdataanalysis.sequences.rm.file.fs;
 import java.util.Date;
 
 import com.google.common.primitives.Bytes;
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.core.file.file.FILE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.BLOCK;
+import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
+import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IFS;
-import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
 
 public class TestJavaFileSystem {
 

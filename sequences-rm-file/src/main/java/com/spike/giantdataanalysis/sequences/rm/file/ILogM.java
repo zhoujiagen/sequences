@@ -1,9 +1,9 @@
 package com.spike.giantdataanalysis.sequences.rm.file;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
+import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
+import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.fs.JavaFileSystem;
 
 /**

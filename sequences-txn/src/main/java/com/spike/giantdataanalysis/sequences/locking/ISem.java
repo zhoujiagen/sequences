@@ -1,8 +1,8 @@
 package com.spike.giantdataanalysis.sequences.locking;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.locking.core.lock.LOCK_MODE;
-import com.spike.giantdataanalysis.sequences.locking.core.semaphore;
+import com.spike.giantdataanalysis.sequences.core.locking.lock.LOCK_MODE;
+import com.spike.giantdataanalysis.sequences.core.locking.semaphore;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 
 /**
  * Semaphore: share or exclusive.

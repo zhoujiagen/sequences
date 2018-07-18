@@ -1,6 +1,6 @@
 package com.spike.giantdataanalysis.sequences.server;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.server.constant.TxnConstant.CommitReturn;
 import com.spike.giantdataanalysis.sequences.server.constant.TxnConstant.ReturnCode;
 import com.spike.giantdataanalysis.sequences.server.constant.TxnConstant.TransactionControl;

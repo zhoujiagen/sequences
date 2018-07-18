@@ -2,8 +2,8 @@ package com.spike.giantdataanalysis.sequences.server;
 
 import java.util.List;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.IOperation;
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.IOperation;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.server.constant.RMConstant;
 
 public interface IRM {

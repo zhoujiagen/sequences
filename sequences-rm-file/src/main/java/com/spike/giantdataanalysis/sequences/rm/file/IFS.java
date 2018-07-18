@@ -2,11 +2,11 @@ package com.spike.giantdataanalysis.sequences.rm.file;
 
 import java.util.List;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.allocparmp;
-import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
+import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.core.file.allocparmp;
+import com.spike.giantdataanalysis.sequences.core.file.file.FILE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.BLOCK;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 
 /**
  * File System.
@@ -23,16 +23,14 @@ public interface IFS {
   class Configuration {
     public CatalogConfiguration catalogConfiguration;
   }
-  
-  
+
   class CatalogConfiguration {
     public String catalogDir = "target/catalog/";
     public String storeFilePreix = "STORE-";
     public String fileDescriptorFilePrefix = "FD-";
     public int nameLength = 10;
   }
-  
-  
+
   enum ReturnCode {
     OK(0), FAIL(1);
     private int code;

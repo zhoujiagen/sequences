@@ -6,7 +6,7 @@ public interface RMConstant {
   // flag definition for XASwitch - XASwitch.flags
   // ---------------------------------------------------------------------------
   long TM_NOFLAGS = 0x00000000L; // no resource manager features selected
-  
+
   long TM_REGISTER = 0x00000001L; // resource manager dynamically registers
   long TM_NOMIGRATE = 0x00000002L; // resource manager does not support association migration
   long TM_USEASYNC = 0x00000004L; // resource manager supports asynchronous operations

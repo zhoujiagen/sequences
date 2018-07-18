@@ -1,8 +1,8 @@
 package com.spike.giantdataanalysis.sequences.locking;
 
-import com.spike.giantdataanalysis.sequences.locking.core.lock.LOCK_CLASS;
-import com.spike.giantdataanalysis.sequences.locking.core.lock.LOCK_MODE;
-import com.spike.giantdataanalysis.sequences.locking.core.lock.lock_name;
+import com.spike.giantdataanalysis.sequences.core.locking.lock.LOCK_CLASS;
+import com.spike.giantdataanalysis.sequences.core.locking.lock.LOCK_MODE;
+import com.spike.giantdataanalysis.sequences.core.locking.lock.lock_name;
 
 /**
  * Lock Manager.

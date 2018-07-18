@@ -1,10 +1,10 @@
 package com.spike.giantdataanalysis.sequences.rm.file.buffer;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.file.page.PAGEID;
+import com.spike.giantdataanalysis.sequences.core.file.page.PAGE_TYPE;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IBM;
 import com.spike.giantdataanalysis.sequences.rm.file.IBM.BUFFER_ACC_CB;
-import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGEID;
-import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGE_TYPE;
 
 public class TestDefaultBufferManager {
   public static void main(String[] args) {

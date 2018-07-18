@@ -2,13 +2,13 @@ package com.spike.giantdataanalysis.sequences.rm.file.buffer;
 
 import java.util.concurrent.Semaphore;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.configuration.FileConfiguration;
+import com.spike.giantdataanalysis.sequences.core.file.file.FILE;
+import com.spike.giantdataanalysis.sequences.core.file.page.PAGEID;
+import com.spike.giantdataanalysis.sequences.core.file.page.PAGE_HEADER;
+import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IBM;
-import com.spike.giantdataanalysis.sequences.rm.file.config.FileConfiguration;
-import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGEID;
-import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGE_HEADER;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
 
 public class DefaultBufferManager implements IBM {
 

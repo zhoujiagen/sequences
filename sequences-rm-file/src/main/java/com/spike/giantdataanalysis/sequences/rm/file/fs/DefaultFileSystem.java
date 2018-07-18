@@ -3,15 +3,15 @@ package com.spike.giantdataanalysis.sequences.rm.file.fs;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.core.file.allocparmp;
+import com.spike.giantdataanalysis.sequences.core.file.file.FILE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.BLOCK;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.basic_file_descriptor;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.exception.FileSystemException;
 import com.spike.giantdataanalysis.sequences.rm.file.IFS;
 import com.spike.giantdataanalysis.sequences.rm.file.catalog.JavaFileCatalogManager;
-import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.allocparmp;
-import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.basic_file_descriptor;
-import com.spike.giantdataanalysis.sequences.rm.file.exception.FileSystemException;
 
 public class DefaultFileSystem implements IFS {
 

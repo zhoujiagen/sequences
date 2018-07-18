@@ -1,27 +1,22 @@
 package com.spike.giantdataanalysis.sequences.rm.file.catalog;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.STORE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.basic_file_descriptor;
+import com.spike.giantdataanalysis.sequences.exception.FileCatalogException;
 import com.spike.giantdataanalysis.sequences.rm.file.IFS.CatalogConfiguration;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.STORE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.basic_file_descriptor;
-import com.spike.giantdataanalysis.sequences.rm.file.exception.FileCatalogException;
 
 /**
  * File Catalog Manager.

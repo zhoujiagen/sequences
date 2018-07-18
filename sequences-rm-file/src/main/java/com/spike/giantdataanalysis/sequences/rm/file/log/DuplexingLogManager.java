@@ -19,16 +19,16 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Bytes;
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
+import com.spike.giantdataanalysis.sequences.core.file.file.FILE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.BLOCK;
+import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
+import com.spike.giantdataanalysis.sequences.core.file.log.LogAnchor;
+import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.exception.LogManagerException;
 import com.spike.giantdataanalysis.sequences.rm.file.IFS;
 import com.spike.giantdataanalysis.sequences.rm.file.ILogM;
-import com.spike.giantdataanalysis.sequences.rm.file.core.ACCESSMODE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.file.FILE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.BLOCK;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogAnchor;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
-import com.spike.giantdataanalysis.sequences.rm.file.exception.LogManagerException;
 
 /**
  * Duplexing log manager.

@@ -14,7 +14,6 @@
  * https://stackoverflow.com/questions/777636/what-is-a-good-open-source-java-se-jta-transactionmanager-implementation
  * Narayana: http://narayana.io/
  * http://narayana.io//docs/project/index.html
- * 
  * </pre>
  */
 package com.spike.giantdataanalysis.sequences.server.test.jta;

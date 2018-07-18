@@ -2,7 +2,7 @@ package com.spike.giantdataanalysis.sequences.server.test.txn.xa;
 
 import java.util.Random;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.server.IRM;
 import com.spike.giantdataanalysis.sequences.server.ITM;
 import com.spike.giantdataanalysis.sequences.server.XID;

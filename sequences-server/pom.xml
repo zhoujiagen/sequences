@@ -18,6 +18,12 @@
 
 		<dependency>
 			<groupId>com.spike.giantdataanalysis</groupId>
+			<artifactId>sequences-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.spike.giantdataanalysis</groupId>
 			<artifactId>sequences-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>

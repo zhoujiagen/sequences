@@ -1,10 +1,10 @@
 package com.spike.giantdataanalysis.sequences.rm.file.core;
 
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.DISK;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.STORE;
-import com.spike.giantdataanalysis.sequences.rm.file.core.catalog.basic_file_descriptor;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LSN;
-import com.spike.giantdataanalysis.sequences.rm.file.core.log.LogRecord;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.DISK;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.STORE;
+import com.spike.giantdataanalysis.sequences.core.file.catalog.basic_file_descriptor;
+import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
+import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 
 public class TestMoreSerializable {
 

@@ -2,8 +2,8 @@ package com.spike.giantdataanalysis.sequences.rm.file;
 
 import java.util.concurrent.Semaphore;
 
-import com.spike.giantdataanalysis.sequences.commons.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.core.page.PAGEID;
+import com.spike.giantdataanalysis.sequences.core.file.page.PAGEID;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 
 /**
  * Buffer Manager: fix pages, unfix pages, flush pages.

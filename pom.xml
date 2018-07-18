@@ -11,22 +11,23 @@
 	<inceptionYear>2018</inceptionYear>
 
 	<modules>
+		<!-- core: data structure -->
+		<module>sequences-core</module>
+		<!-- commons: utilities -->
+		<module>sequences-commons</module>
+		<!-- txn: TM, Lock -->
+		<module>sequences-txn</module>
+		<!-- rm: file, log -->
+		<module>sequences-rm-file</module>
+
+		<!-- server: -->
+		<module>sequences-server</module>
+
+		<!-- api -->
 		<module>sequences-api</module>
 		<module>sequences-api-cassandra</module>
 		<module>sequences-api-hbase</module>
 		<module>sequences-api-mysql</module>
-		<module>sequences-commons</module>
-		<module>sequences-server</module>
-
-		<!-- txn: TM, Lock -->
-		<module>sequences-txn</module>
-
-		<!-- TM -->
-		<!--<module>sequences-tm</module>-->
-		<!--<module>sequences-tm-log</module>-->
-		<!-- RM: file -->
-		<module>sequences-rm-file</module>
-
 	</modules>
 
 	<licenses>

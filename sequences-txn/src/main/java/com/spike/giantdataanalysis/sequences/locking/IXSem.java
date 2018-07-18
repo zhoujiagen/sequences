@@ -1,6 +1,6 @@
 package com.spike.giantdataanalysis.sequences.locking;
 
-import com.spike.giantdataanalysis.sequences.locking.core.xsemaphore;
+import com.spike.giantdataanalysis.sequences.core.locking.xsemaphore;
 
 /**
  * Exclusive Semaphore.
