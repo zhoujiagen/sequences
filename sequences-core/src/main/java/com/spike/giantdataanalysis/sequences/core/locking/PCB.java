@@ -1,11 +1,12 @@
 package com.spike.giantdataanalysis.sequences.core.locking;
 
 import com.spike.giantdataanalysis.sequences.core.support.FieldSwapableObject;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.ICUpdateable;
 
 /**
  * Process Control Block.
  */
-public class PCB implements FieldSwapableObject<Long> {
+public class PCB implements FieldSwapableObject<Long>, ICUpdateable<PCB> {
 
   public static final long INVALID_PID = -1;
   public long pid = INVALID_PID; // process id
@@ -17,6 +18,32 @@ public class PCB implements FieldSwapableObject<Long> {
 
   public static PCB NULL() {
     return new PCB(INVALID_PID);
+  }
+
+  // ---------------------------------------------------------------------------
+  // ICUpdateable
+  // ---------------------------------------------------------------------------
+
+  @Override
+  public void update(PCB t) {
+    if (t == null) return;
+
+    this.pid = t.pid;
+    this.sem_wait = t.sem_wait;
+  }
+
+  // ---------------------------------------------------------------------------
+  // FieldSwapableObject
+  // ---------------------------------------------------------------------------
+
+  @Override
+  public Long out() {
+    return pid;
+  }
+
+  @Override
+  public void in(Long object) {
+    this.pid = object != null ? object : INVALID_PID;
   }
 
   @Override
@@ -46,16 +73,6 @@ public class PCB implements FieldSwapableObject<Long> {
       if (other.sem_wait != null) return false;
     } else if (!sem_wait.equals(other.sem_wait)) return false;
     return true;
-  }
-
-  @Override
-  public Long out() {
-    return pid;
-  }
-
-  @Override
-  public void in(Long object) {
-    this.pid = object != null ? object : INVALID_PID;
   }
 
 }

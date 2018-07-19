@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
+import com.spike.giantdataanalysis.sequences.core.locking.PCB;
 
 public abstract class ProcessManager {
 
@@ -14,6 +15,8 @@ public abstract class ProcessManager {
 
   private static Map<Long, DefaultProcess> processes = Maps.newConcurrentMap();
   private static AtomicLong maxPID = new AtomicLong(0L);
+  // PCB holder
+  private static final Map<Long, PCB> pcbs = Maps.newConcurrentMap();
 
   public static long maxPID() {
     return maxPID.get();
@@ -43,6 +46,7 @@ public abstract class ProcessManager {
     LOG.debug("unregister Process {}", pid);
 
     DefaultProcess result = processes.remove(pid);
+    pcbs.remove(pid);
     return result;
   }
 
@@ -72,12 +76,22 @@ public abstract class ProcessManager {
     process._wakeup();
   }
 
+  public static PCB MyPCB(long pid) {
+    PCB pcb = pcbs.get(pid);
+    return pcb;
+  }
+
+  public static void MyPCB(long pid, PCB newPCB) {
+    pcbs.put(pid, newPCB);
+  }
+
   public static String snapshot() {
 
     StringBuilder sb = new StringBuilder();
     sb.append(DefaultProcess.currentProcess().id());
     sb.append(", maxPID=").append(maxPID());
     sb.append(", processes=").append(processes);
+    sb.append(", pcbs=").append(pcbs.values());
 
     return sb.toString();
   }

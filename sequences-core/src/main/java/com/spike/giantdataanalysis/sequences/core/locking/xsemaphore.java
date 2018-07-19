@@ -1,15 +1,16 @@
 package com.spike.giantdataanalysis.sequences.core.locking;
 
 import com.spike.giantdataanalysis.sequences.core.support.FieldSwapableObject;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.ICUpdateable;
 
 /**
  * Exclusive Semaphore abstraction.
  * <p>
  * list of process cb, the last one hold the semaphore, others wait using FIFO
  */
-public class xsemaphore implements FieldSwapableObject<Long> {
+public class xsemaphore implements FieldSwapableObject<Long>, ICUpdateable<PCB> {
 
-  public final String id = "1234";// Hashing.sha1().hashLong(new Date().getTime()).toString();
+  public final String id = "";// Hashing.sha1().hashLong(new Date().getTime()).toString();
   public PCB pcb;
 
   public xsemaphore(PCB pcb) {
@@ -20,10 +21,18 @@ public class xsemaphore implements FieldSwapableObject<Long> {
     return new xsemaphore(pcb);
   }
 
+  // ---------------------------------------------------------------------------
+  // ICUpdateable
+  // ---------------------------------------------------------------------------
+
   @Override
-  public String toString() {
-    return "xsemaphore[id=" + id + ", pcb=" + (pcb == null ? "NULL" : pcb.toString()) + "]";
+  public void update(PCB t) {
+    pcb.update(t);
   }
+
+  // ---------------------------------------------------------------------------
+  // FieldSwapableObject
+  // ---------------------------------------------------------------------------
 
   @Override
   public Long out() {
@@ -40,4 +49,10 @@ public class xsemaphore implements FieldSwapableObject<Long> {
       pcb.in(object);
     }
   }
+
+  @Override
+  public String toString() {
+    return "xsemaphore[id=" + id + ", pcb=" + (pcb == null ? "NULL" : pcb.toString()) + "]";
+  }
+
 }

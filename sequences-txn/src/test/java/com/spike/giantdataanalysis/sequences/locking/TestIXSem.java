@@ -17,7 +17,7 @@ public class TestIXSem {
       @Override
       public void run() {
         while (true) {
-          System.out.println(ProcessManager.snapshot());
+          System.out.println("\t" + ProcessManager.snapshot());
           try {
             Thread.sleep(2000L);
           } catch (InterruptedException e) {

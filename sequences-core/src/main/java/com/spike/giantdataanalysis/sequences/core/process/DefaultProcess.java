@@ -1,11 +1,8 @@
 package com.spike.giantdataanalysis.sequences.core.process;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.spike.giantdataanalysis.sequences.core.locking.PCB;
 
 /**
@@ -18,15 +15,12 @@ public final class DefaultProcess {
   private final Object monitor = new Object();
   private volatile boolean isRunnable = true;
 
-  // PCB holder
-  private static final Map<Long, PCB> pcbs = Maps.newConcurrentMap();
-
   DefaultProcess() {
   }
 
   DefaultProcess(Runnable runnable) {
     thread = new Thread(runnable);
-    pcbs.put(thread.getId(), new PCB(thread.getId()));
+    ProcessManager.MyPCB(thread.getId(), new PCB(thread.getId()));
   }
 
   public static long MyPID() {
@@ -34,11 +28,14 @@ public final class DefaultProcess {
   }
 
   public static PCB MyPCB() {
-    return pcbs.get(MyPID());
+    return ProcessManager.MyPCB(MyPID());
   }
 
   public static void MyPCB(PCB newPCB) {
-    pcbs.put(MyPID(), newPCB);
+    if (newPCB.pid != MyPID()) {
+      throw new RuntimeException("invalid operation: cross process inner state update!");
+    }
+    ProcessManager.MyPCB(MyPID(), newPCB);
   }
 
   public static DefaultProcess currentProcess() {
@@ -95,7 +92,6 @@ public final class DefaultProcess {
 
   @Override
   public String toString() {
-    return "Process[id=" + this.id() + ", pcb=" + pcbs.get(MyPID()) + ", isRunnable=" + isRunnable
-        + "]";
+    return "Process[" + this.id() + "," + isRunnable + "]";
   }
 }

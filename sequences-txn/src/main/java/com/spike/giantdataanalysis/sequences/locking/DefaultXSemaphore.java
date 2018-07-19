@@ -7,9 +7,9 @@ import com.spike.giantdataanalysis.sequences.core.locking.PCB;
 import com.spike.giantdataanalysis.sequences.core.locking.xsemaphore;
 import com.spike.giantdataanalysis.sequences.core.process.DefaultProcess;
 import com.spike.giantdataanalysis.sequences.core.process.ProcessManager;
+import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.CUPtr;
 import com.spike.giantdataanalysis.sequences.core.support.NativeOps;
 
-// FIXME(zhoujiagen) restart from here
 public class DefaultXSemaphore implements IXSem {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultXSemaphore.class);
@@ -21,32 +21,33 @@ public class DefaultXSemaphore implements IXSem {
 
   @Override
   public void Xsem_get(xsemaphore sem) {
-    LOG.debug("get sem: {}", sem);
+    LOG.debug("{} get sem: {}", DefaultProcess.MyPID(), sem);
 
     PCB _new = DefaultProcess.MyPCB();
     PCB old = PCB.NULL();
 
     do {
       _new.sem_wait = old;
-    } while (!NativeOps.CSF(sem, old, _new));
+    } while (!NativeOps.CSP(CUPtr.of(sem.pcb), CUPtr.of(old), CUPtr.of(_new)));
 
-    if (old.pid != DefaultProcess.MyPID()) {
-      LOG.debug("{} wait on: sem={}", DefaultProcess.currentProcess().id(), sem);
+    if (old.pid != PCB.INVALID_PID && old.pid != DefaultProcess.MyPID()) {
+      LOG.debug("{} (old.pid = {}), wait on: sem={}", DefaultProcess.MyPID(), old.pid, sem);
+      DefaultProcess.MyPCB(sem.pcb);
       ProcessManager._wait(DefaultProcess.currentProcess().id());
     }
   }
 
   @Override
   public void Xsem_give(xsemaphore sem) {
-    LOG.debug("give sem: {}", sem);
+    LOG.debug("{} give sem: {}", DefaultProcess.MyPID(), sem);
 
     PCB _new = PCB.NULL();
     PCB old = DefaultProcess.MyPCB();
-    if (NativeOps.CSF(sem, old, _new)) { // the last one
+    if (NativeOps.CSP(CUPtr.of(sem.pcb), CUPtr.of(old), CUPtr.of(_new))) { // the last one
       return;
     }
     // toward head
-    while (old != null && !DefaultProcess.MyPCB().equals(old.sem_wait)) {
+    while (old.sem_wait != null && old.sem_wait.pid != DefaultProcess.MyPID()) {
       old = old.sem_wait;
     }
 
