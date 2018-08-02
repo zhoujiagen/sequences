@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
+import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 import com.spike.giantdataanalysis.sequences.faultmodel.store.StoreConfiguration;
 import com.spike.giantdataanalysis.sequences.faultmodel.store.Stores;
-import com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes;
 
 // ---------------------------------------------------------------------------
 // external behavior: store_read(), store_write(), message_send(), message_get()

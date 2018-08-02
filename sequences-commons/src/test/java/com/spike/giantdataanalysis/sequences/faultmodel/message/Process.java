@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
-import com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes;
+import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 
 class Process {
   private static final Logger LOG = LoggerFactory.getLogger(Process.class);

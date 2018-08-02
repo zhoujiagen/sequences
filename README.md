@@ -4,6 +4,8 @@ Sequences
 
 # Main References
 
+[1] Transaction Processing: Concepts and Techniques
+
     @book{Gray:1992:TPC:573304,
      author = {Gray, Jim and Reuter, Andreas},
      title = {Transaction Processing: Concepts and Techniques},
@@ -13,6 +15,14 @@ Sequences
      publisher = {Morgan Kaufmann Publishers Inc.},
      address = {San Francisco, CA, USA},
     }
+
+[2] X/Open Distributed Transaction Processing
+
++ Reference Model, Version 3
++ The TX (Transaction Demarcation) Specification
++ The XA+ Specification, Version 2
+
+[3] [JSR-000907 JavaTM Transaction API](https://www.jcp.org/en/jsr/detail?id=907)
 
 # API
 
@@ -44,4 +54,12 @@ Sequences
 + DSL: SQL?
 + storage: format, partition and replica
 + daemon with active-standby: gossip and coordination
-+ anagement utilities: system status and metric
++ management utilities: system status and metric
+
+### Components
+
++ Lock Manager
++ Log Manager
++ Transaction Manager
++ File Manager: Catalog, Buffer Manager, Tuple/Index Organization
+

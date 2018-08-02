@@ -11,7 +11,7 @@ class SessionMessage {
   @Override
   public String toString() {
     return "SM[" + messageType + "]: "
-        + com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes.toHex(value);
+        + com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes.toHex(value);
   }
 
 }
@@ -31,7 +31,7 @@ class Message {
   @Override
   public String toString() {
     return "SM[" + status + "]: "
-        + com.spike.giantdataanalysis.sequences.faultmodel.support.MoreBytes.toHex(value);
+        + com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes.toHex(value);
   }
 
 }
