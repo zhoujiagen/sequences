@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
-import com.spike.giantdataanalysis.sequences.core.locking.PCB;
+import com.spike.giantdataanalysis.sequences.core.cb.PCB;
 
 public abstract class ProcessManager {
 

@@ -1,26 +1,26 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.spike.giantdataanalysis</groupId>
-		<artifactId>sequences</artifactId>
+		<artifactId>sequences-api</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>sequences-api</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>sequences-api-core</artifactId>
+
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-
-	<modules>
-		<module>sequences-api-core</module>
-		<module>sequences-api-mysql</module>
-		<module>sequences-api-hbase</module>
-		<module>sequences-api-cassandra</module>
-	</modules>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

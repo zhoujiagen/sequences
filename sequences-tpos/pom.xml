@@ -7,20 +7,46 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>sequences-api</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>sequences-tpos</artifactId>
+
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+	<dependencies>
 
-	<modules>
-		<module>sequences-api-core</module>
-		<module>sequences-api-mysql</module>
-		<module>sequences-api-hbase</module>
-		<module>sequences-api-cassandra</module>
-	</modules>
+		<dependency>
+			<groupId>com.spike.giantdataanalysis</groupId>
+			<artifactId>sequences-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

@@ -3,7 +3,7 @@ package com.spike.giantdataanalysis.sequences.core.support;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
-import com.spike.giantdataanalysis.sequences.core.locking.PCB;
+import com.spike.giantdataanalysis.sequences.core.cb.PCB;
 import com.spike.giantdataanalysis.sequences.core.locking.lock.LOCK_MODE;
 import com.spike.giantdataanalysis.sequences.core.locking.semaphore;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.CUPtr;

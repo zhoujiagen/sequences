@@ -15,19 +15,20 @@
 		<module>sequences-core</module>
 		<!-- commons: utilities -->
 		<module>sequences-commons</module>
-		<!-- txn: TM, Lock -->
-		<module>sequences-txn</module>
-		<!-- rm: file, log -->
-		<module>sequences-rm-file</module>
+		<!-- locking: Lock -->
+		<module>sequences-locking</module>
+		<!-- filesystem: file, log, access path -->
+		<module>sequences-filesystem</module>
 
 		<!-- server: -->
 		<module>sequences-server</module>
+		<!-- tpservice: TP service -->
+		<module>sequences-tpservice</module>
+		<!-- tpos: TP operating system -->
+		<module>sequences-tpos</module>
 
 		<!-- api -->
 		<module>sequences-api</module>
-		<module>sequences-api-cassandra</module>
-		<module>sequences-api-hbase</module>
-		<module>sequences-api-mysql</module>
 	</modules>
 
 	<licenses>

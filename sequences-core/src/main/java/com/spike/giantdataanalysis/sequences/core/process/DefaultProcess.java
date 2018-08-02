@@ -3,7 +3,7 @@ package com.spike.giantdataanalysis.sequences.core.process;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.spike.giantdataanalysis.sequences.core.locking.PCB;
+import com.spike.giantdataanalysis.sequences.core.cb.PCB;
 
 /**
  * Thread based Process implementation.

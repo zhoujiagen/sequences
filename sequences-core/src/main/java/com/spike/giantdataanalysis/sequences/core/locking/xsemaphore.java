@@ -1,5 +1,6 @@
 package com.spike.giantdataanalysis.sequences.core.locking;
 
+import com.spike.giantdataanalysis.sequences.core.cb.PCB;
 import com.spike.giantdataanalysis.sequences.core.support.FieldSwapableObject;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.ICUpdateable;
 

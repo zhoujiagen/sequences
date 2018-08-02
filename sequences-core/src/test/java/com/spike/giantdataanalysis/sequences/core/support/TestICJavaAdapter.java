@@ -1,6 +1,6 @@
 package com.spike.giantdataanalysis.sequences.core.support;
 
-import com.spike.giantdataanalysis.sequences.core.locking.PCB;
+import com.spike.giantdataanalysis.sequences.core.cb.PCB;
 
 public class TestICJavaAdapter {
 

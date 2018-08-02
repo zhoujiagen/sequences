@@ -4,7 +4,8 @@ import java.util.List;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
-import com.spike.giantdataanalysis.sequences.core.txn.TransCB;
+import com.spike.giantdataanalysis.sequences.core.cb.PCB;
+import com.spike.giantdataanalysis.sequences.core.cb.TransCB;
 
 public interface lock {
 
