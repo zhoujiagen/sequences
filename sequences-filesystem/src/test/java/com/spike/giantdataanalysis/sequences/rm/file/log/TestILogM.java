@@ -6,7 +6,7 @@ import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.ILogM;
 
-public class TestDuplexingLogManager {
+public class TestILogM {
   public static void main(String[] args) {
 
     ILogM.Configuration configuration = new ILogM.Configuration();
