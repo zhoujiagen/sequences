@@ -10,7 +10,6 @@ import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
 import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.rm.file.IFS;
-import com.spike.giantdataanalysis.sequences.rm.file.fs.JavaFileSystem;
 
 public class TestIFS {
 

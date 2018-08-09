@@ -1,6 +1,5 @@
 package com.spike.giantdataanalysis.sequences.fs.java.tpfs;
 
-import java.nio.file.FileSystem;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -11,6 +10,7 @@ import com.spike.giantdataanalysis.sequences.fs.java.tpfs.catalog.TPINode;
 public final class TPFSCB {
   private static TPFSCB INSTANCE = new TPFSCB();
 
+  // [FSP-3] Create an internal cache to keep track of file systems created by this provider.
   TPFileSystemProvider fileSystemProvider;
   TPFileSystem fileSystem;
 

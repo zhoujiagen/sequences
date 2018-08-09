@@ -14,20 +14,32 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 
-// NEED TEST!!!
 public class TestTPFS {
   public static void main(String[] args) throws IOException {
 
-    // TPFSConfiguration
-
+    // set up TPFSConfiguration here
+    URI uri = URI.create("tp:///");
+    System.out.println(uri.getPath());
     FileSystem fs = FileSystems.getFileSystem(URI.create("tp:///"));
     Path path = fs.getPath("/foo");
     System.out.println(path.normalize().toUri().toString());
-    Files.createDirectories(path);
+    Files.createDirectories(path); // create directory
     Path hello = path.resolve("hello.txt");
-    
+    System.out.println(hello.toAbsolutePath().toUri());
+
     FileStore fileStore = Files.getFileStore(path);
-    System.out.println(fileStore.name());
+    System.out.println(fileStore.name()); // file store
+
+    // write
+    Files.write(hello, ImmutableList.of("hello world"), StandardCharsets.UTF_8);
+
+    // read
+    try (BufferedReader reader = Files.newBufferedReader(hello);) {
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        System.out.println(line);
+      }
+    }
   }
 
   static void jimfs() throws IOException {

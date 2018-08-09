@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchKey;
@@ -24,14 +25,25 @@ public class TPPath implements Path {
   public TPPath() {
   }
 
-  public TPPath(String first, String... more) {
-    Preconditions.checkArgument(first.startsWith(TPFSConfiguration.PATH_ROOT),
-      "only support absolute path");
+  private static String ROOT = TPFSConfiguration.PATH_ROOT;
+  private static String SEP = TPFSConfiguration.PATH_SEP;
 
-    paths.addAll(Splitter.on(TPFSConfiguration.PATH_SEP).splitToList(first));
+  public TPPath(String first, String... more) {
+    Preconditions.checkArgument(first.startsWith(ROOT), "only support absolute path");
+
+    for (String path : Splitter.on(SEP).splitToList(first)) {
+      if (!"".equals(path.trim())) {
+        paths.add(path);
+      }
+    }
+
     if (more.length > 0) {
       for (String m : more) {
-        paths.addAll(Splitter.on(TPFSConfiguration.PATH_SEP).splitToList(m));
+        for (String path : Splitter.on(SEP).splitToList(m)) {
+          if (!"".equals(path.trim())) {
+            paths.add(path);
+          }
+        }
       }
     }
   }
@@ -42,25 +54,23 @@ public class TPPath implements Path {
 
   @Override
   public int compareTo(Path other) {
-    return Joiner.on(TPFSConfiguration.PATH_SEP).join(paths)
-        .compareTo(Joiner.on(TPFSConfiguration.PATH_SEP).join(other));
+    return Joiner.on(SEP).join(paths).compareTo(Joiner.on(SEP).join(other));
   }
 
   @Override
   public boolean endsWith(Path other) {
-    return Joiner.on(TPFSConfiguration.PATH_SEP).join(paths)
-        .endsWith(Joiner.on(TPFSConfiguration.PATH_SEP).join(other));
+    return Joiner.on(SEP).join(paths).endsWith(Joiner.on(SEP).join(other));
   }
 
   @Override
   public boolean endsWith(String other) {
-    return Joiner.on(TPFSConfiguration.PATH_SEP).join(paths).endsWith(other);
+    return Joiner.on(SEP).join(paths).endsWith(other);
   }
 
   @Override
   public Path getFileName() {
     if (paths.size() == 0) return null;
-    return TPPath.newPath(paths.get(paths.size() - 1));
+    return TPPath.newPath(ROOT + paths.get(paths.size() - 1));
   }
 
   @Override
@@ -70,7 +80,7 @@ public class TPPath implements Path {
 
   @Override
   public Path getName(int index) {
-    return TPPath.newPath(paths.get(index));
+    return TPPath.newPath(ROOT + paths.get(index));
   }
 
   @Override
@@ -86,7 +96,7 @@ public class TPPath implements Path {
 
   @Override
   public TPPath getRoot() {
-    return TPPath.newPath(paths.get(0));
+    return TPPath.newPath(ROOT + paths.get(0));
   }
 
   @Override
@@ -98,18 +108,18 @@ public class TPPath implements Path {
   public Iterator<Path> iterator() {
     List<Path> _paths = Lists.newArrayList();
     for (String path : paths) {
-      _paths.add(TPPath.newPath(path));
+      _paths.add(TPPath.newPath(ROOT + path));
     }
     return _paths.iterator();
   }
 
   @Override
   public TPPath normalize() {
-    return TPPath.newPath(Joiner.on(TPFSConfiguration.PATH_SEP).join(paths));
+    return TPPath.newPath(ROOT + Joiner.on(SEP).join(paths));
   }
 
   private String normalizePath() {
-    return Joiner.on(TPFSConfiguration.PATH_SEP).join(paths);
+    return ROOT + Joiner.on(SEP).join(paths);
   }
 
   @Override
@@ -130,22 +140,22 @@ public class TPPath implements Path {
 
   @Override
   public TPPath resolve(Path other) {
-    throw new UnsupportedOperationException();
+    return TPPath.newPath(normalizePath(), ((TPPath) other).normalizePath());
   }
 
   @Override
   public TPPath resolve(String other) {
-    return TPPath.newPath(getParent().normalizePath(), other);
+    return TPPath.newPath(normalizePath(), other);
   }
 
   @Override
   public TPPath resolveSibling(Path other) {
-    throw new UnsupportedOperationException();
+    return TPPath.newPath(getParent().normalizePath(), ((TPPath) other).normalizePath());
   }
 
   @Override
   public TPPath resolveSibling(String other) {
-    throw new UnsupportedOperationException();
+    return TPPath.newPath(getParent().normalizePath(), other);
   }
 
   @Override
@@ -164,27 +174,29 @@ public class TPPath implements Path {
     for (int i = beginIndex; i < endIndex; i++) {
       sub.add(paths.get(i));
     }
-    return TPPath.newPath(Joiner.on(TPFSConfiguration.PATH_SEP).join(sub));
+    return TPPath.newPath(ROOT + Joiner.on(SEP).join(sub));
   }
 
   @Override
   public TPPath toAbsolutePath() {
-    return normalize();
+    return this;
   }
 
   @Override
   public File toFile() {
-    throw new UnsupportedOperationException();
+    // 转换为实际的路径: use underlying file system
+    return Paths.get(TPFSConfiguration.STORE_ROOT + normalizePath()).toFile();
   }
 
   @Override
   public Path toRealPath(LinkOption... options) throws IOException {
-    throw new UnsupportedOperationException();
+    // 转换为实际的路径: use underlying file system
+    return Paths.get(TPFSConfiguration.STORE_ROOT + normalizePath());
   }
 
   @Override
   public URI toUri() {
-    return URI.create(TPFSConfiguration.FS_PATH_PREFIX + normalizePath());
+    return URI.create(TPFSConfiguration.FS_SCHEMA_PATH_PREFIX + normalizePath());
   }
 
 }
