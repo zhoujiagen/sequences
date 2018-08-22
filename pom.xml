@@ -27,6 +27,9 @@
 		<!-- tpos: TP operating system -->
 		<module>sequences-tpos</module>
 
+		<!-- query -->
+		<module>sequences-query</module>
+
 		<!-- api -->
 		<module>sequences-api</module>
 	</modules>
