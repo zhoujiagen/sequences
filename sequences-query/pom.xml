@@ -35,6 +35,13 @@
 			<version>5.1.45</version>
 		</dependency>
 
+		<!-- ANTLR -->
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>4.7.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>

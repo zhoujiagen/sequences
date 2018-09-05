@@ -9,3 +9,7 @@
 [Tutorial](https://calcite.apache.org/docs/tutorial.html)
 [Adapters](https://calcite.apache.org/docs/adapter.html)
 [JSON models](https://calcite.apache.org/docs/model.html)
+
++ ANTLR
+
+IDEA Plugin: ANTLR v4 grammar plugin
