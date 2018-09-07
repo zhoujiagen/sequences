@@ -1,5 +1,11 @@
 grammar SPARQLQuery;
 
+@header {
+package com.spike.giantdataanalysis.sequences.query.antlr.sparql;
+}
+//---------------------------------------------------------------------------
+// parser grammar
+//---------------------------------------------------------------------------
 //[1] 查询单元
 gQueryUnit: gQuery;
 //[2] 查询语句
@@ -145,7 +151,7 @@ gMinusGraphPattern: K_MINUS gGroupGraphPattern;
 //[67]
 gGroupOrUnionGraphPattern: gGroupGraphPattern ( K_UNION gGroupGraphPattern )*;
 //[68] 过滤FILTER
-gFilter: ('FILTER'| 'filter' | K_FILTER) gConstraint;
+gFilter: K_FILTER gConstraint;
 //[69] 约束: 带括号的表达式, 内建调用, 函数调用
 gConstraint: gBrackettedExpression | gBuiltInCall | gFunctionCall;
 //[70] 函数调用: IRI 参数列表
@@ -361,6 +367,128 @@ gPrefixedName: PNAME_LN | PNAME_NS;
 //[138]
 gBlankNode: BLANK_NODE_LABEL |	ANON;
 
+
+//---------------------------------------------------------------------------
+// lexer grammar
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+// KEYWORDS
+// use 'CaseChangingCharStream'
+// REF: https://github.com/antlr/antlr4/blob/master/doc/case-insensitive-lexing.md
+//---------------------------------------------------------------------------
+K_ABS: 'ABS' ;
+K_ADD: 'ADD' ;
+K_ALL: 'ALL' ;
+K_AS: 'AS' ;
+K_ASC: 'ASC' ;
+K_ASK: 'ASK' ;
+K_AVG: 'AVG' ;
+K_BASE: 'BASE' ;
+K_BIND: 'BIND' ;
+K_BNODE: 'BNODE' ;
+K_BOUND: 'BOUND' ;
+K_BY: 'BY' ;
+K_CEIL: 'CEIL' ;
+K_CLEAR: 'CLEAR' ;
+K_COALESCE: 'COALESCE' ;
+K_CONCAT: 'CONCAT' ;
+K_CONSTRUCT: 'CONSTRUCT' ;
+K_CONTAINS: 'CONTAINS' ;
+K_COPY: 'COPY' ;
+K_COUNT: 'COUNT' ;
+K_CREATE: 'CREATE' ;
+K_DATATYPE: 'DATATYPE' ;
+K_DAY: 'DAY' ;
+K_DEFAULT: 'DEFAULT' ;
+K_DELETE: 'DELETE' ;
+K_DESC: 'DESC' ;
+K_DESCRIBE: 'DESCRIBE' ;
+K_DISTINCT: 'DISTINCT' ;
+K_DROP: 'DROP' ;
+K_ENCODE_FOR_URI: 'ENCODE_FOR_URI' ;
+K_EXISTS: 'EXISTS' ;
+K_FILTER: 'FILTER' ;
+K_FLOOR: 'FLOOR' ;
+K_FROM: 'FROM' ;
+K_GRAPH: 'GRAPH' ;
+K_GROUP: 'GROUP' ;
+K_GROUP_CONCAT: 'GROUP_CONCAT' ;
+K_HAVING: 'HAVING' ;
+K_HOURS: 'HOURS' ;
+K_IF: 'IF' ;
+K_IN: 'IN' ;
+K_INSERT: 'INSERT' ;
+K_INTO: 'INTO' ;
+K_IRI: 'IRI' ;
+K_LANG: 'LANG' ;
+K_LANGMATCHES: 'LANGMATCHES' ;
+K_LCASE: 'LCASE' ;
+K_LIMIT: 'LIMIT' ;
+K_LOAD: 'LOAD' ;
+K_MAX: 'MAX' ;
+K_MD5: 'MD5' ;
+K_MIN: 'MIN' ;
+K_MINUS: 'MINUS' ;
+K_MINUTES: 'MINUTES' ;
+K_MONTH: 'MONTH' ;
+K_MOVE: 'MOVE' ;
+K_NAMED: 'NAMED' ;
+K_NOT: 'NOT' ;
+K_NOW: 'NOW' ;
+K_OFFSET: 'OFFSET' ;
+K_OPTIONAL: 'OPTIONAL' ;
+K_ORDER: 'ORDER' ;
+K_PREFIX: 'PREFIX' ;
+K_RAND: 'RAND' ;
+K_REDUCED: 'REDUCED' ;
+K_REGEX: 'REGEX' ;
+K_REPLACE: 'REPLACE' ;
+K_ROUND: 'ROUND' ;
+K_SAMPLE: 'SAMPLE' ;
+K_SECONDS: 'SECONDS' ;
+K_SELECT: 'SELECT' ;
+K_SEPARATOR: 'SEPARATOR' ;
+K_SERVICE: 'SERVICE' ;
+K_SHA1: 'SHA1' ;
+K_SHA256: 'SHA256' ;
+K_SHA384: 'SHA384' ;
+K_SHA512: 'SHA512' ;
+K_SILENT: 'SILENT' ;
+K_STR: 'STR' ;
+K_STRAFTER: 'STRAFTER' ;
+K_STRBEFORE: 'STRBEFORE' ;
+K_STRDT: 'STRDT' ;
+K_STRENDS: 'STRENDS' ;
+K_STRLANG: 'STRLANG' ;
+K_STRLEN: 'STRLEN' ;
+K_STRSTARTS: 'STRSTARTS' ;
+K_STRUUID: 'STRUUID' ;
+K_SUBSTR: 'SUBSTR' ;
+K_SUM: 'SUM' ;
+K_TIMEZONE: 'TIMEZONE' ;
+K_TO: 'TO' ;
+K_TZ: 'TZ' ;
+K_UCASE: 'UCASE' ;
+K_UNDEF: 'UNDEF' ;
+K_UNION: 'UNION' ;
+K_URI: 'URI' ;
+K_USING: 'USING' ;
+K_UUID: 'UUID' ;
+K_VALUES: 'VALUES' ;
+K_WHERE: 'WHERE' ;
+K_WITH: 'WITH' ;
+K_YEAR: 'YEAR' ;
+K_A: 'A' ;
+K_false: 'FALSE' ;
+K_isBLANK: 'ISBLANK' ;
+K_isIRI: 'ISIRI' ;
+K_isLITERAL: 'ISLITERAL' ;
+K_isNUMERIC: 'ISNUMERIC' ;
+K_isURI: 'ISURI' ;
+K_sameTerm: 'SAMETERM' ;
+K_true: 'TRUE' ;
+K_DATA: 'DATA';
+
 //[139]
 //IRIREF::=  	'<' ([^<>"{}|^`\]-[#x00-#x20])* '>'
 //IRIREF: '<' (~([[<>"{}|`\\\]] | '^') |'-'| [0-9a-zA-Z#/:] | '.')* '>';
@@ -444,145 +572,4 @@ HEX: [0-9] | [A-F] | [a-f];
 PN_LOCAL_ESC: '\\' ( '_' | '~' | '.' | '-' | '!' | '$' | '&' | '\'' | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%' );
 
 
-// KEYWORDS
-K_ABS: A B S  WS*;
-K_ADD: A D D  WS*;
-K_ALL: A L L  WS*;
-K_AS: A S  WS*;
-K_ASC: A S C  WS*;
-K_ASK: A S K  WS*;
-K_AVG: A V G  WS*;
-K_BASE: B A S E  WS*;
-K_BIND: B I N D  WS*;
-K_BNODE: B N O D E  WS*;
-K_BOUND: B O U N D  WS*;
-K_BY: B Y  WS*;
-K_CEIL: C E I L  WS*;
-K_CLEAR: C L E A R  WS*;
-K_COALESCE: C O A L E S C E  WS*;
-K_CONCAT: C O N C A T  WS*;
-K_CONSTRUCT: C O N S T R U C T  WS*;
-K_CONTAINS: C O N T A I N S  WS*;
-K_COPY: C O P Y  WS*;
-K_COUNT: C O U N T  WS*;
-K_CREATE: C R E A T E  WS*;
-K_DATATYPE: D A T A T Y P E  WS*;
-K_DAY: D A Y  WS*;
-K_DEFAULT: D E F A U L T  WS*;
-K_DELETE: D E L E T E  WS*;
-K_DESC: D E S C  WS*;
-K_DESCRIBE: D E S C R I B E  WS*;
-K_DISTINCT: D I S T I N C T  WS*;
-K_DROP: D R O P  WS*;
-K_ENCODE_FOR_URI: E N C O D E '_' F O R '_' U R I  WS*;
-K_EXISTS: E X I S T S  WS*;
-K_FILTER: F I L T E R  WS*;
-K_FLOOR: F L O O R  WS*;
-K_FROM: F R O M  WS*;
-K_GRAPH: G R A P H  WS*;
-K_GROUP: G R O U P  WS*;
-K_GROUP_CONCAT: G R O U P '_' C O N C A T  WS*;
-K_HAVING: H A V I N G  WS*;
-K_HOURS: H O U R S  WS*;
-K_IF: I F  WS*;
-K_IN: I N  WS*;
-K_INSERT: I N S E R T  WS*;
-K_INTO: I N T O  WS*;
-K_IRI: I R I  WS*;
-K_LANG: L A N G  WS*;
-K_LANGMATCHES: L A N G M A T C H E S  WS*;
-K_LCASE: L C A S E  WS*;
-K_LIMIT: L I M I T  WS*;
-K_LOAD: L O A D  WS*;
-K_MAX: M A X  WS*;
-K_MD5: M D '5'  WS*;
-K_MIN: M I N  WS*;
-K_MINUS: M I N U S  WS*;
-K_MINUTES: M I N U T E S  WS*;
-K_MONTH: M O N T H  WS*;
-K_MOVE: M O V E  WS*;
-K_NAMED: N A M E D  WS*;
-K_NOT: N O T  WS*;
-K_NOW: N O W  WS*;
-K_OFFSET: O F F S E T  WS*;
-K_OPTIONAL: O P T I O N A L  WS*;
-K_ORDER: O R D E R  WS*;
-K_PREFIX: P R E F I X  WS*;
-K_RAND: R A N D  WS*;
-K_REDUCED: R E D U C E D  WS*;
-K_REGEX: R E G E X  WS*;
-K_REPLACE: R E P L A C E  WS*;
-K_ROUND: R O U N D  WS*;
-K_SAMPLE: S A M P L E  WS*;
-K_SECONDS: S E C O N D S  WS*;
-K_SELECT: S E L E C T  WS*;
-K_SEPARATOR: S E P A R A T O R  WS*;
-K_SERVICE: S E R V I C E  WS*;
-K_SHA1: S H A '1'  WS*;
-K_SHA256: S H A '256'  WS*;
-K_SHA384: S H A '384'  WS*;
-K_SHA512: S H A '512'  WS*;
-K_SILENT: S I L E N T  WS*;
-K_STR: S T R  WS*;
-K_STRAFTER: S T R A F T E R  WS*;
-K_STRBEFORE: S T R B E F O R E  WS*;
-K_STRDT: S T R D T  WS*;
-K_STRENDS: S T R E N D S  WS*;
-K_STRLANG: S T R L A N G  WS*;
-K_STRLEN: S T R L E N  WS*;
-K_STRSTARTS: S T R S T A R T S  WS*;
-K_STRUUID: S T R U U I D  WS*;
-K_SUBSTR: S U B S T R  WS*;
-K_SUM: S U M  WS*;
-K_TIMEZONE: T I M E Z O N E  WS*;
-K_TO: T O  WS*;
-K_TZ: T Z  WS*;
-K_UCASE: U C A S E  WS*;
-K_UNDEF: U N D E F  WS*;
-K_UNION: U N I O N  WS*;
-K_URI: U R I  WS*;
-K_USING: U S I N G  WS*;
-K_UUID: U U I D  WS*;
-K_VALUES: V A L U E S  WS*;
-K_WHERE: W H E R E  WS*;
-K_WITH: W I T H  WS*;
-K_YEAR: Y E A R  WS*;
-K_A: A  WS*;
-K_false: F A L S E  WS*;
-K_isBLANK: I S B L A N K  WS*;
-K_isIRI: I S I R I  WS*;
-K_isLITERAL: I S L I T E R A L  WS*;
-K_isNUMERIC: I S N U M E R I C  WS*;
-K_isURI: I S U R I  WS*;
-K_sameTerm: S A M E T E R M  WS*;
-K_true: T R U E  WS*;
-K_DATA: D A T A;
 
-
-// Case-Insensitive Lexing: https://github.com/antlr/antlr4/blob/master/doc/case-insensitive-lexing.md
-fragment A: [aA]; // match either an 'a' or 'A'
-fragment B: [bB];
-fragment C: [cC];
-fragment D: [dD];
-fragment E: [eE];
-fragment F: [fF];
-fragment G: [gG];
-fragment H: [hH];
-fragment I: [iI];
-fragment J: [jJ];
-fragment K: [kK];
-fragment L: [lL];
-fragment M: [mM];
-fragment N: [nN];
-fragment O: [oO];
-fragment P: [pP];
-fragment Q: [qQ];
-fragment R: [rR];
-fragment S: [sS];
-fragment T: [tT];
-fragment U: [uU];
-fragment V: [vV];
-fragment W: [wW];
-fragment X: [xX];
-fragment Y: [yY];
-fragment Z: [zZ];
