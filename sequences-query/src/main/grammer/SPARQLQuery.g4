@@ -14,29 +14,29 @@ gQuery: gPrologue
                 gValuesClause;
 //[3] 更新单元
 gUpdateUnit: gUpdate;
-//[4]
+//[4] 序言: BASE, PREFIX
 gPrologue: ( gBaseDecl | gPrefixDecl )*;
-//[5]
+//[5] BASE声明
 gBaseDecl: K_BASE IRIREF;
-//[6]
+//[6] PREFIX声明
 gPrefixDecl: K_PREFIX PNAME_NS IRIREF;
-//[7]
+//[7] SELECT查询
 gSelectQuery: gSelectClause gDatasetClause* gWhereClause gSolutionModifier;
-//[8]
+//[8] 子SELECT
 gSubSelect: gSelectClause gWhereClause gSolutionModifier gValuesClause;
-//[9]
+//[9] SELECT子句
 gSelectClause: K_SELECT ( K_DISTINCT | K_REDUCED )? ( ( gVar | ( '(' gExpression K_AS gVar ')' ) )+ | '*' );
-//[10]
+//[10] CONSTRUCT查询
 gConstructQuery: K_CONSTRUCT ( gConstructTemplate gDatasetClause* gWhereClause gSolutionModifier | gDatasetClause* K_WHERE '{' gTriplesTemplate? '}' gSolutionModifier );
-//[11]
+//[11] DESCRIBE查询
 gDescribeQuery: K_DESCRIBE ( gVarOrIri+ | '*' ) gDatasetClause* gWhereClause? gSolutionModifier;
-//[12]
+//[12] ASK查询
 gAskQuery: K_ASK gDatasetClause* gWhereClause gSolutionModifier;
-//[13]
+//[13] 数据集子句
 gDatasetClause: K_FROM ( gDefaultGraphClause | gNamedGraphClause );
-//[14]
+//[14] 默认图子句
 gDefaultGraphClause: gSourceSelector;
-//[15]
+//[15] 命名图子句
 gNamedGraphClause: K_NAMED gSourceSelector;
 //[16]
 gSourceSelector: giri;
@@ -44,26 +44,26 @@ gSourceSelector: giri;
 gWhereClause: K_WHERE? gGroupGraphPattern;
 //[18]
 gSolutionModifier: gGroupClause? gHavingClause? gOrderClause? gLimitOffsetClauses?;
-//[19]
+//[19] GRROUP BY子句
 gGroupClause: K_GROUP K_BY gGroupCondition+;
-//[20]
+//[20] GROUP BY条件
 gGroupCondition: gBuiltInCall | gFunctionCall | '(' gExpression ( K_AS gVar )? ')' | gVar;
-//[21]
+//[21] HAVING子句
 gHavingClause: K_HAVING gHavingCondition+;
-//[22]
+//[22] HAVING条件
 gHavingCondition: gConstraint;
-//[23]
+//[23] ORDER BY子句
 gOrderClause: K_ORDER K_BY gOrderCondition+;
-//[24]
+//[24] ORDER BY条件
 gOrderCondition: ( ( K_ASC | K_DESC ) gBrackettedExpression )
  | ( gConstraint | gVar );
-//[25]
+//[25] LIMIT/OFFSET子句
 gLimitOffsetClauses: gLimitClause gOffsetClause? | gOffsetClause gLimitClause?;
-//[26]
+//[26] LIMIT子句
 gLimitClause: K_LIMIT INTEGER;
-//[27]
+//[27] OFFSET子句
 gOffsetClause: K_OFFSET INTEGER;
-//[28]
+//[28] VALUES子句
 gValuesClause: ( K_VALUES gDataBlock )?;
 //[29]
 gUpdate: gPrologue ( gUpdate1 ( ';' gUpdate )? )?;
@@ -97,7 +97,7 @@ gDeleteClause: K_DELETE gQuadPattern;
 gInsertClause: K_INSERT gQuadPattern;
 //[44] 使用子句
 gUsingClause: K_USING ( giri | K_NAMED giri );
-//[45]
+//[45] 图声明: DEFAULT或GRAPH
 gGraphOrDefault: K_DEFAULT | K_GRAPH? giri;
 //[46] 图引用
 gGraphRef: K_GRAPH giri;
@@ -134,7 +134,7 @@ gOptionalGraphPattern: K_OPTIONAL gGroupGraphPattern;
 gGraphGraphPattern: K_GRAPH gVarOrIri gGroupGraphPattern;
 //[59]
 gServiceGraphPattern: K_SERVICE K_SILENT? gVarOrIri gGroupGraphPattern;
-//[60]
+//[60] BIND
 gBind: K_BIND '(' gExpression K_AS gVar ')';
 //[61]
 gInlineData: K_VALUES gDataBlock;
@@ -190,23 +190,23 @@ gVerbSimple: gVar;
 gObjectListPath: gObjectPath ( ',' gObjectPath )*;
 //[87]
 gObjectPath: gGraphNodePath;
-//[88]
+//[88] 路径
 gPath: gPathAlternative;
-//[89]
+//[89] 路径备选
 gPathAlternative: gPathSequence ( '|' gPathSequence )*;
-//[90]
+//[90] 路径序列
 gPathSequence: gPathEltOrInverse ( '/' gPathEltOrInverse )*;
-//[91]
+//[91] 路径元素
 gPathElt: gPathPrimary gPathMod?;
-//[92]
+//[92] 路径元素或逆路径元素
 gPathEltOrInverse: gPathElt | '^' gPathElt;
-//[93]
+//[93] 路径模式
 gPathMod: '?' | '*' | '+';
-//[94]
+//[94] 基本路径: IRI, a, 路径补, 分组路径
 gPathPrimary: giri | K_A | '!' gPathNegatedPropertySet | '(' gPath ')';
-//[95]
+//[95] 路径补属性集
 gPathNegatedPropertySet: gPathOneInPropertySet | '(' ( gPathOneInPropertySet ( '|' gPathOneInPropertySet )* )? ')';
-//[96]
+//[96] 属性集中长度为1的路径
 gPathOneInPropertySet: giri | K_A | '^' ( giri | K_A );
 //[97]
 gInteger: INTEGER;
@@ -243,30 +243,31 @@ gConditionalAndExpression: gValueLogical ( '&&' gValueLogical )*;
 //[113] 值逻辑
 gValueLogical: gRelationalExpression;
 //[114] 关系表达式
-gRelationalExpression: gNumericExpression ( '=' gNumericExpression
-                                            | '!=' gNumericExpression
-                                            | '<' gNumericExpression
-                                            | '>' gNumericExpression
-                                            | '<=' gNumericExpression
-                                            | '>=' gNumericExpression
-                                            | K_IN gExpressionList
-                                            | K_NOT K_IN gExpressionList )?;
+gRelationalExpression: gNumericExpression ( gRelationalExpression2 )?;
+gRelationalExpression2: '=' gNumericExpression
+                        | '!=' gNumericExpression
+                        | '<' gNumericExpression
+                        | '>' gNumericExpression
+                        | '<=' gNumericExpression
+                        | '>=' gNumericExpression
+                        | K_IN gExpressionList
+                        | K_NOT K_IN gExpressionList;
 //[115] 数值表达式
 gNumericExpression: gAdditiveExpression;
 //[116] 可加数值表达式
-gAdditiveExpression: gMultiplicativeExpression ( '+' gMultiplicativeExpression
-                                            | '-' gMultiplicativeExpression
-                                            | ( gNumericLiteralPositive
-                                            | gNumericLiteralNegative ) ( ( '*' gUnaryExpression ) | ( '/' gUnaryExpression ) )* )*;
+//AdditiveExpression	  ::=	MultiplicativeExpression ( '+' MultiplicativeExpression | '-' MultiplicativeExpression | ( NumericLiteralPositive | NumericLiteralNegative ) ( ( '*' UnaryExpression ) | ( '/' UnaryExpression ) )* )*
+gAdditiveExpression: gMultiplicativeExpression ( ((('+'|'-') gMultiplicativeExpression)) | (( gNumericLiteralPositive | gNumericLiteralNegative ) ( ( ('*' | '/') gUnaryExpression ))*) )*;
+
 //[117] 可乘数值表达式
-gMultiplicativeExpression: gUnaryExpression ( '*' gUnaryExpression | '/' gUnaryExpression )*;
+//MultiplicativeExpression	  ::=  	UnaryExpression ( '*' UnaryExpression | '/' UnaryExpression )*
+gMultiplicativeExpression: gUnaryExpression ( (('*'|'/') gUnaryExpression) )*;
 //[118] 一元表达式
 gUnaryExpression: '!' gPrimaryExpression
-	|	'+' gPrimaryExpression
-	|	'-' gPrimaryExpression
-	|	gPrimaryExpression;
+                  |	'+' gPrimaryExpression
+                  |	'-' gPrimaryExpression
+                  |	gPrimaryExpression;
 //[119] 原始表达式
-gPrimaryExpression: gBrackettedExpression | gBuiltInCall | giriOrFunction | gRDFLiteral | gNumericLiteral | gBooleanLiteral | gVar;
+gPrimaryExpression: gBrackettedExpression | gNumericLiteral | gBooleanLiteral | gRDFLiteral |  gBuiltInCall | giriOrFunction   | gVar;
 //[120] 带括号的表达式
 gBrackettedExpression: '(' gExpression ')';
 //[121] 内建调用
@@ -345,26 +346,26 @@ gAggregate: K_COUNT '(' K_DISTINCT? ( '*' | gExpression ) ')'
     | K_GROUP_CONCAT '(' K_DISTINCT? gExpression ( ';' K_SEPARATOR '=' gString )? ')';
 //[128]
 giriOrFunction: giri gArgList?;
-//[129]
+//[129] RDF字面量
 gRDFLiteral: gString ( LANGTAG | ( '^^' giri ) )?;
-//[130]
+//[130] 数值字面量
 gNumericLiteral: gNumericLiteralUnsigned | gNumericLiteralPositive | gNumericLiteralNegative;
-//[131]
+//[131] 无符号数值字面量
 gNumericLiteralUnsigned: INTEGER |	DECIMAL |	DOUBLE;
-//[132]
+//[132] 正数值字面量
 gNumericLiteralPositive: INTEGER_POSITIVE |	DECIMAL_POSITIVE |	DOUBLE_POSITIVE;
-//[133]
+//[133] 负数值字面量
 gNumericLiteralNegative: INTEGER_NEGATIVE |	DECIMAL_NEGATIVE |	DOUBLE_NEGATIVE;
-//[134]
+//[134] 布尔字面量
 gBooleanLiteral: K_true |	K_false;
 //[135] 字符串: 添加空字符串规则gBlankString和词法规则NON_SKIP_WS
 gString: STRING_LITERAL1 | STRING_LITERAL2 | STRING_LITERAL_LONG1 | STRING_LITERAL_LONG2 | gBlankString;
 gBlankString: '"' NON_SKIP_WS* '"' | '\'' NON_SKIP_WS* '\'';
 //[136] IRI: IRI引用, 带前缀的名字(例foaf:knows)
 giri: IRIREF |	gPrefixedName;
-//[137]
+//[137] 带前缀的名字
 gPrefixedName: PNAME_LN | PNAME_NS;
-//[138]
+//[138] 空节点
 gBlankNode: BLANK_NODE_LABEL |	ANON;
 
 
