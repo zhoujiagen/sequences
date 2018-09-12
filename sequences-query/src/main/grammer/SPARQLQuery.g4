@@ -533,7 +533,7 @@ COMMENT: '#' ~[\r\n]* -> skip;
 //[139]
 //IRIREF::=  	'<' ([^<>"{}|^`\]-[#x00-#x20])* '>'
 //IRIREF: '<' (~([[<>"{}|`\\\]] | '^') |'-'| [0-9a-zA-Z#/:] | '.')* '>';
-IRIREF: '<' (~([[<>"{}|`\\\]] | '^') |'-'| [0-9a-zA-Z#/:] | '.')* '>';
+IRIREF: '<' ( ~('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`') | (PN_CHARS))* '>';
 //[140]
 PNAME_NS: PN_PREFIX? ':';
 //[141]
@@ -568,10 +568,10 @@ DOUBLE_NEGATIVE: '-' DOUBLE;
 EXPONENT: [eE] [+-]? [0-9]+;
 //[156]
 //STRING_LITERAL1::=  	"'" ( ([^#x27#x5C#xA#xD]) | ECHAR )* "'"
-STRING_LITERAL1: '\'' ( [0-9a-zA-Z_^\\. ] | ('-' | ':') | ECHAR )* '\'';
+STRING_LITERAL1: '\'' ( ~('\u0027' | '\u005C' | '\u000A' | '\u000D') | ECHAR )* '\'';
 //[157]
 //	STRING_LITERAL2::=  	'"' ( ([^#x22#x5C#xA#xD]) | ECHAR )* '"'
-STRING_LITERAL2: '"' ( [0-9a-zA-Z_^\\. ] | ('-' | ':') | ECHAR )* '"';
+STRING_LITERAL2: '"'  ( ~('\u0022' | '\u005C' | '\u000A' | '\u000D') | ECHAR )* '"';
 //[158]
 //STRING_LITERAL_LONG1::=  	"'''" ( ( "'" | "''" )? ( [^'\] | ECHAR ) )* "'''"
 STRING_LITERAL_LONG1: '\'\'\'' ( ( '\'' | '\'\'' )? ( [^'\\] | ECHAR ) )* '\'\'\'';
