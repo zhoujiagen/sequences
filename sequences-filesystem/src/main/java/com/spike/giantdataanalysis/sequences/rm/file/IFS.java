@@ -20,12 +20,21 @@ import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParam
  */
 public interface IFS {
 
-  class Configuration {
-    public CatalogConfiguration catalogConfiguration;
+  class FileSystemConfiguration {
+    // data
+    public FileSystemDataFileConfiguration dataFileConfiguration;
+    // catalog
+    public FileSystemCatalogConfiguration catalogConfiguration;
   }
 
-  class CatalogConfiguration {
-    public String catalogDir = "target/catalog/";
+  class FileSystemDataFileConfiguration {
+    public String dataRootDir = "target/data/";
+  }
+
+  class FileSystemCatalogConfiguration {
+    public String catalogRootDir = "target/catalog/";
+    public int blockSizeInByte = 4 * 1024; // 4KB
+
     public String storeFilePreix = "STORE-";
     public String fileDescriptorFilePrefix = "FD-";
     public int nameLength = 10;

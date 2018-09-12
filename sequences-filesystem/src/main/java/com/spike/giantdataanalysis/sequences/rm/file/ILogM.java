@@ -4,7 +4,7 @@ import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
 import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.fs.JavaFileSystem;
+import com.spike.giantdataanalysis.sequences.rm.file.fs.LocalFileSystem;
 
 /**
  * Log manager.
@@ -15,7 +15,7 @@ public interface ILogM {
     public String directory2;
     public String filePreix = "LOG";
     public int nameLength = 10;
-    public IFS fileSystem = new JavaFileSystem();
+    public IFS fileSystem = new LocalFileSystem();
 
     public long lsnCacheThreshold = Long.MAX_VALUE;
 

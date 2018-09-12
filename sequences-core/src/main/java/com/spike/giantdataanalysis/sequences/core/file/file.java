@@ -12,6 +12,11 @@ public interface file {
     public FILE() {
     }
 
+    public FILE(FILE file) {
+      this.filename = file.filename;
+      this.fileno = file.fileno;
+    }
+
     public FILE(int fileno, String filename) {
       this.fileno = fileno;
       this.filename = filename;

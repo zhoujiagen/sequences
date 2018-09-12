@@ -15,19 +15,19 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.spike.giantdataanalysis.sequences.core.file.catalog.STORE;
 import com.spike.giantdataanalysis.sequences.core.file.catalog.basic_file_descriptor;
-import com.spike.giantdataanalysis.sequences.exception.FileCatalogException;
-import com.spike.giantdataanalysis.sequences.rm.file.IFS.CatalogConfiguration;
+import com.spike.giantdataanalysis.sequences.rm.file.IFS.FileSystemCatalogConfiguration;
+import com.spike.giantdataanalysis.sequences.rm.file.exception.FileCatalogException;
 
 /**
  * File Catalog Manager.
  * <p>
  * Operate on <code>STORE</code>, <code>basic_file_descriptor</code>.
  */
-public class JavaFileCatalogManager {
+public class FileCatalogManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(JavaFileCatalogManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileCatalogManager.class);
 
-  private CatalogConfiguration configuration;
+  private FileSystemCatalogConfiguration configuration;
 
   // STORE/DISK, basic_file_descriptor
   private STORE storeCache;
@@ -41,7 +41,7 @@ public class JavaFileCatalogManager {
     STORE, FD
   }
 
-  public JavaFileCatalogManager(CatalogConfiguration configuration) {
+  public FileCatalogManager(FileSystemCatalogConfiguration configuration) {
     this.configuration = configuration;
 
     this.initialize();
@@ -69,7 +69,7 @@ public class JavaFileCatalogManager {
   private File getOrCreateFile(Catalog catalog) {
     File result = null;
 
-    File catalogDirFile = new File(configuration.catalogDir);
+    File catalogDirFile = new File(configuration.catalogRootDir);
     if (!catalogDirFile.isDirectory() || !catalogDirFile.exists()) {
       throw FileCatalogException.newE("invalid catalogDir");
     }

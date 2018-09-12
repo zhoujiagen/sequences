@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.exception;
+package com.spike.giantdataanalysis.sequences.rm.file.exception;
 
 public class FileSystemException extends RuntimeException {
   private static final long serialVersionUID = 1L;

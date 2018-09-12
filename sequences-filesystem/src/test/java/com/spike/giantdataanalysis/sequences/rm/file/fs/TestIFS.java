@@ -14,12 +14,13 @@ import com.spike.giantdataanalysis.sequences.rm.file.IFS;
 public class TestIFS {
 
   public static void main(String[] args) throws Exception {
-    write_log();
+    simple();
+    // write_log();
   }
 
   static void write_log() throws Exception {
 
-    IFS fs = new JavaFileSystem();
+    IFS fs = new LocalFileSystem();
 
     String base = "target/";
     String filename = base + "hello.txt";
@@ -57,7 +58,7 @@ public class TestIFS {
 
   static void simple() {
 
-    IFS fs = new JavaFileSystem();
+    IFS fs = new LocalFileSystem();
 
     String base = "target/";
     String filename = base + "hello.txt";

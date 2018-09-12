@@ -25,14 +25,12 @@ public class TPFileStore extends FileStore {
 
   @Override
   public Object getAttribute(String attribute) throws IOException {
-    // TODO Implement TPFileStore.getAttribute
-    return null;
+        return null;
   }
 
   @Override
   public <V extends FileStoreAttributeView> V getFileStoreAttributeView(Class<V> type) {
-    // TODO Implement TPFileStore.getFileStoreAttributeView
-    return null;
+        return null;
   }
 
   @Override

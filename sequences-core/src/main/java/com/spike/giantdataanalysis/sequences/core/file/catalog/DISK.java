@@ -13,8 +13,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.spike.giantdataanalysis.sequences.exception.FileCatalogException;
-import com.spike.giantdataanalysis.sequences.exception.FileSystemException;
 import com.spike.giantdataanalysis.sequences.serialize.Dumpable;
 import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
 import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.Ops;
@@ -66,7 +64,7 @@ public class DISK implements Dumpable, MoreSerializable.Stringable<DISK> {
 
   @Override
   public int size() {
-    throw FileSystemException.newE("not used");
+    return -1;
   }
 
   @Override
@@ -117,7 +115,7 @@ public class DISK implements Dumpable, MoreSerializable.Stringable<DISK> {
 
   public DISK(String diskid, int slotSize) {
     if (slotSize < 0) {
-      throw FileCatalogException.newE("invalid slotSize");
+      throw new IllegalArgumentException("invalid slotSize");
     }
     this.diskid = diskid;
     // this.slots = new SLOT[slotSize];
