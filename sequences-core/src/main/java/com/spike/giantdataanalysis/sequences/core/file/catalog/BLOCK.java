@@ -1,5 +1,6 @@
 package com.spike.giantdataanalysis.sequences.core.file.catalog;
 
+@Deprecated
 public final class BLOCK {
 
   public static class BLOCKHEAD {

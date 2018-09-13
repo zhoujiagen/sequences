@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.rm.file.catalog;
+package com.spike.giantdataanalysis.sequences.filesystem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,14 +15,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.spike.giantdataanalysis.sequences.core.file.catalog.STORE;
 import com.spike.giantdataanalysis.sequences.core.file.catalog.basic_file_descriptor;
-import com.spike.giantdataanalysis.sequences.rm.file.IFS.FileSystemCatalogConfiguration;
-import com.spike.giantdataanalysis.sequences.rm.file.exception.FileCatalogException;
+import com.spike.giantdataanalysis.sequences.filesystem.configuration.FileSystemCatalogConfiguration;
+import com.spike.giantdataanalysis.sequences.filesystem.exception.FileCatalogException;
 
 /**
  * File Catalog Manager.
  * <p>
  * Operate on <code>STORE</code>, <code>basic_file_descriptor</code>.
  */
+@Deprecated
 public class FileCatalogManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(FileCatalogManager.class);

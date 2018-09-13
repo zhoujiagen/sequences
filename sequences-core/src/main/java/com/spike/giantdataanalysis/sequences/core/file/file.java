@@ -4,6 +4,7 @@ public interface file {
   /**
    * File handle: FILEID.
    */
+  @Deprecated
   public class FILE implements Comparable<FILE> {
 
     public String filename; // absolute path or relative path

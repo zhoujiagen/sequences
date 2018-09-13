@@ -1,6 +1,9 @@
-package com.spike.giantdataanalysis.sequences.core.file;
+package com.spike.giantdataanalysis.sequences.filesystem;
 
-public enum ACCESSMODE {
+/**
+ * File Access Mode.
+ */
+public enum FileAccessModeEnum {
   /** read */
   R,
   /** update */
@@ -8,7 +11,8 @@ public enum ACCESSMODE {
   /** append */
   A;
 
-  public static boolean isCompatible(ACCESSMODE before, ACCESSMODE after) {
+  public static boolean isCompatible(FileAccessModeEnum before, FileAccessModeEnum after) {
+    if (before.equals(after)) return true;
     if (before == R && after == R) return true;
     if (before == U && after == U) return true;
     if (before == A && after == A) return true;

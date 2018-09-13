@@ -65,7 +65,7 @@ public class TPFileSystem extends FileSystem {
   @Override
   public PathMatcher getPathMatcher(String syntaxAndPattern) {
     Preconditions.checkState(opened);
-        return null;
+    return null;
   }
 
   // [FS-2.1] Number of roots – A file system can have a single hierarchy of files with one root, or
@@ -82,7 +82,7 @@ public class TPFileSystem extends FileSystem {
 
   @Override
   public UserPrincipalLookupService getUserPrincipalLookupService() {
-        return null;
+    return null;
   }
 
   @Override
@@ -98,7 +98,7 @@ public class TPFileSystem extends FileSystem {
 
   @Override
   public WatchService newWatchService() throws IOException {
-        return null;
+    return null;
   }
 
   @Override
@@ -108,7 +108,7 @@ public class TPFileSystem extends FileSystem {
 
   @Override
   public Set<String> supportedFileAttributeViews() {
-        return null;
+    return null;
   }
 
 }

@@ -1,10 +1,12 @@
 package com.spike.giantdataanalysis.sequences.rm.file;
 
-import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
 import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.rm.file.fs.LocalFileSystem;
+import com.spike.giantdataanalysis.sequences.filesystem.FileAccessModeEnum;
+import com.spike.giantdataanalysis.sequences.filesystem.IFileSystem;
+import com.spike.giantdataanalysis.sequences.filesystem.LocalFileSystem;
+import com.spike.giantdataanalysis.sequences.filesystem.configuration.FileSystemConfiguration;
 
 /**
  * Log manager.
@@ -15,14 +17,14 @@ public interface ILogM {
     public String directory2;
     public String filePreix = "LOG";
     public int nameLength = 10;
-    public IFS fileSystem = new LocalFileSystem();
+    public IFileSystem fileSystem = new LocalFileSystem(new FileSystemConfiguration());
 
     public long lsnCacheThreshold = Long.MAX_VALUE;
 
     public int logRecordSizeInOneFile = 10000;
   }
 
-  boolean logtable_open(ACCESSMODE accessMode);
+  boolean logtable_open(FileAccessModeEnum accessMode);
 
   void logtable_close();
 

@@ -1,9 +1,9 @@
 package com.spike.giantdataanalysis.sequences.rm.file.log;
 
-import com.spike.giantdataanalysis.sequences.core.file.ACCESSMODE;
 import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
 import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
+import com.spike.giantdataanalysis.sequences.filesystem.FileAccessModeEnum;
 import com.spike.giantdataanalysis.sequences.rm.file.ILogM;
 
 public class TestILogM {
@@ -23,7 +23,7 @@ public class TestILogM {
   }
 
   static void read(ILogM lm) {
-    lm.logtable_open(ACCESSMODE.R);
+    lm.logtable_open(FileAccessModeEnum.R);
 
     LSN lsn = new LSN(LSN.NULL.file, 0L);
     OutParameter<LogRecord> header = new OutParameter<>();
@@ -34,7 +34,7 @@ public class TestILogM {
   }
 
   static void log_insert(ILogM lm) {
-    lm.logtable_open(ACCESSMODE.A);
+    lm.logtable_open(FileAccessModeEnum.A);
 
     int rmid = 1;
     int txnid1 = 1;
