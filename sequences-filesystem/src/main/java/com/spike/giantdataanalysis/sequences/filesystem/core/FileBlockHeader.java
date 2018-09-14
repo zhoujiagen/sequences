@@ -3,25 +3,46 @@ package com.spike.giantdataanalysis.sequences.filesystem.core;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Bytes;
+import com.spike.giantdataanalysis.sequences.filesystem.core.cache.CacheEntity;
+import com.spike.giantdataanalysis.sequences.filesystem.core.cache.CacheTargetEnum;
+import com.spike.giantdataanalysis.sequences.filesystem.core.cache.FileSystemCache;
 import com.spike.giantdataanalysis.sequences.filesystem.exception.FileSystemException;
+import com.spike.giantdataanalysis.sequences.serialize.Byteable;
 
 import fr.devnied.bitlib.BitUtils;
 
 /**
  * File Block Header Abstraction.
  */
-public class FileBlockHeader {
+public class FileBlockHeader implements CacheEntity, Byteable<FileBlockHeader> {
+  private static final long serialVersionUID = 1L;
 
   public static final int LENGTH_BLOCK_SIZE_TYPE = 2;
 
   public static final int DEFUALT_BLOCK_SIZE_TYPE = 0;
 
-  // 0: 4KB, 1: 8KB, 2: 16KB
-  private int blockSizeType = 0;
+  /**
+   * ORGANIZAITON(bits):
+   * 
+   * <pre>
+   *  block id (?)
+   *  block size type (2)
+   *  block type (3)
+   *  next block id (?)
+   *  record count (?)
+   *  free offset(13)
+   * </pre>
+   */
+
+  private int blockSizeType = 0; // 0: 4KB, 1: 8KB, 2: 16KB
   private int freeByteOffset = 0;
+
+  private ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
 
   public FileBlockHeader(int blockSizeType, int freeByteOffset) {
     Preconditions.checkArgument(freeByteOffset >= getReprByteSize(blockSizeType));
@@ -33,6 +54,10 @@ public class FileBlockHeader {
   public FileBlockHeader(int blockSizeType) {
     this.blockSizeType = blockSizeType;
     this.freeByteOffset = getReprByteSize(blockSizeType);
+  }
+
+  public ReentrantReadWriteLock lock() {
+    return lock;
   }
 
   public void increaseFreeOffset(int delta) {
@@ -83,7 +108,7 @@ public class FileBlockHeader {
     }
   }
 
-  public static FileBlockHeader fromBytes(byte[] b) {
+  public static FileBlockHeader from(byte[] b) {
     BitUtils bitUtils = new BitUtils(b);
     int blockSizeType = bitUtils.getNextInteger(LENGTH_BLOCK_SIZE_TYPE);
     int freeByteOffset = bitUtils.getNextInteger(getReprBitSize(blockSizeType));
@@ -95,16 +120,59 @@ public class FileBlockHeader {
   }
 
   /**
-   * extract entity from RAF.
+   * get file block header.
    * <p>
-   * NOTE: caller has seeked raf; rewind pos after this call.
+   * rewind file pos after this call.
+   * @param fileBlockEntity
+   * @return
+   */
+  public static FileBlockHeader from(Integer blockSizeInByte, FileBlockEntity fileBlockEntity) {
+    FileBlockHeader result = null;
+    FileLock fileLock = null;
+    long beforePosition = -1L;
+    try {
+
+      beforePosition = fileBlockEntity.getFileEntity().getHandler().getFilePointer();
+      long postion = blockSizeInByte * fileBlockEntity.getBlockIndex();
+      fileLock = fileBlockEntity.getFileEntity().lock(postion, blockSizeInByte, false);
+
+      fileBlockEntity.getFileEntity().getHandler().seek(postion);
+      result =
+          (FileBlockHeader) FileSystemCache.I().get(CacheTargetEnum.FILE_BLOCK, fileBlockEntity);
+      if (result == null) {
+        result = fromHandler(fileBlockEntity.getFileEntity().getHandler());
+        FileSystemCache.I().put(CacheTargetEnum.FILE_BLOCK, fileBlockEntity, result);
+      }
+
+    } catch (IOException e) {
+      throw FileSystemException.newE(e);
+    } finally {
+      if (fileLock != null && fileLock.isValid()) {
+        try {
+          fileLock.release();
+        } catch (IOException e) {
+          throw FileSystemException.newE(e);
+        }
+      }
+      if (beforePosition != -1) {
+        try {
+          fileBlockEntity.getFileEntity().getHandler().seek(beforePosition);
+        } catch (IOException e) {
+          throw FileSystemException.newE(e);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * extract entity from RAF.
    * @param raf
    * @return
    */
-  public static FileBlockHeader fromHandler(RandomAccessFile raf) {
+  private static FileBlockHeader fromHandler(RandomAccessFile raf) {
     try {
-
-      long startPosition = raf.getFilePointer();
 
       byte firstByte = -1;
       try {
@@ -117,13 +185,10 @@ public class FileBlockHeader {
       int blockHeaderByteSize = getReprByteSize(blockSizeType);
       byte[] bs = new byte[blockHeaderByteSize - 1];
       raf.read(bs, 0, blockHeaderByteSize - 1);
-      FileBlockHeader result =
-          FileBlockHeader.fromBytes(Bytes.concat(new byte[] { firstByte }, bs));
+      FileBlockHeader result = from(Bytes.concat(new byte[] { firstByte }, bs));
       if (result.getFreeByteOffset() == 0) {
         result.setFreeOffset(result.getReprByteSize());
       }
-
-      raf.seek(startPosition);
 
       return result;
     } catch (IOException e) {
@@ -136,14 +201,6 @@ public class FileBlockHeader {
     return bitUtils.getNextInteger(LENGTH_BLOCK_SIZE_TYPE);
   }
 
-  public byte[] toBytes() {
-    BitUtils bitUtils = new BitUtils(getReprByteSize(blockSizeType) * Byte.SIZE);
-    bitUtils.setCurrentBitIndex(0);
-    bitUtils.setNextInteger(blockSizeType, LENGTH_BLOCK_SIZE_TYPE);
-    bitUtils.setNextInteger(freeByteOffset, getReprBitSize(blockSizeType));
-    return bitUtils.getData();
-  }
-
   public int getBlockSizeType() {
     return blockSizeType;
   }
@@ -154,8 +211,30 @@ public class FileBlockHeader {
 
   @Override
   public String toString() {
-    return "FileBlockHeader [headerSize=" + getReprByteSize() + ", freeByteOffset=" + freeByteOffset
+    return "BlockHeader [headerSize=" + getReprByteSize() + ", freeByteOffset=" + freeByteOffset
         + "]";
   }
 
+  // ---------------------------------------------------------------------------
+  // Byteable
+  // ---------------------------------------------------------------------------
+
+  @Override
+  public int size() {
+    return LENGTH_BLOCK_SIZE_TYPE + getReprBitSize(blockSizeType);
+  }
+
+  @Override
+  public FileBlockHeader fromBytes(byte[] bytes) {
+    return from(bytes);
+  }
+
+  @Override
+  public byte[] toBytes() {
+    BitUtils bitUtils = new BitUtils(getReprByteSize(blockSizeType) * Byte.SIZE);
+    bitUtils.setCurrentBitIndex(0);
+    bitUtils.setNextInteger(blockSizeType, LENGTH_BLOCK_SIZE_TYPE);
+    bitUtils.setNextInteger(freeByteOffset, getReprBitSize(blockSizeType));
+    return bitUtils.getData();
+  }
 }

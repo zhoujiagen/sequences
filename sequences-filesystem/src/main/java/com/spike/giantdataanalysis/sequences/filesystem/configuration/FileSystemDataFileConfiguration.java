@@ -1,5 +1,14 @@
 package com.spike.giantdataanalysis.sequences.filesystem.configuration;
 
 public class FileSystemDataFileConfiguration {
-  public String dataRootDir = "target/data/";
+  private String dataRootDir = "target/data/";
+
+  public String getDataRootDir() {
+    return dataRootDir;
+  }
+
+  public void setDataRootDir(String dataRootDir) {
+    this.dataRootDir = dataRootDir;
+  }
+
 }

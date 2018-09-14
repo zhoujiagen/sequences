@@ -1,10 +1,28 @@
 package com.spike.giantdataanalysis.sequences.filesystem.configuration;
 
-public class FileSystemConfiguration {
+public final class FileSystemConfiguration {
   // data
-  public FileSystemDataFileConfiguration dataFileConfiguration =
+  private FileSystemDataFileConfiguration dataFileConfiguration =
       new FileSystemDataFileConfiguration();
 
   // catalog
-  public FileSystemCatalogConfiguration catalogConfiguration = new FileSystemCatalogConfiguration();
+  private FileSystemCatalogConfiguration catalogConfiguration =
+      new FileSystemCatalogConfiguration();
+
+  public FileSystemCatalogConfiguration getCatalogConfiguration() {
+    return catalogConfiguration;
+  }
+
+  public FileSystemDataFileConfiguration getDataFileConfiguration() {
+    return dataFileConfiguration;
+  }
+
+  public void setDataFileConfiguration(FileSystemDataFileConfiguration dataFileConfiguration) {
+    this.dataFileConfiguration = dataFileConfiguration;
+  }
+
+  public void setCatalogConfiguration(FileSystemCatalogConfiguration catalogConfiguration) {
+    this.catalogConfiguration = catalogConfiguration;
+  }
+
 }

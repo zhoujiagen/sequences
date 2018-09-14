@@ -13,7 +13,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.spike.giantdataanalysis.sequences.core.file.allocparmp;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
+import com.spike.giantdataanalysis.sequences.serialize.Stringable;
 
 /**
  * catalog of a file: including <ui>
@@ -22,7 +22,7 @@ import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
  * <p>
  * should be stored persistently.
  */
-public class basic_file_descriptor implements MoreSerializable.Stringable<basic_file_descriptor> {
+public class basic_file_descriptor implements Stringable<basic_file_descriptor> {
   private static final long serialVersionUID = 1L;
 
   public static basic_file_descriptor NULL = new basic_file_descriptor();

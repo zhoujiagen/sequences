@@ -1,155 +1,144 @@
 package com.spike.giantdataanalysis.sequences.filesystem;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.LinkedList;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.spike.giantdataanalysis.sequences.core.file.catalog.STORE;
-import com.spike.giantdataanalysis.sequences.core.file.catalog.basic_file_descriptor;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 import com.spike.giantdataanalysis.sequences.filesystem.configuration.FileSystemCatalogConfiguration;
+import com.spike.giantdataanalysis.sequences.filesystem.configuration.FileSystemConfiguration;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileBlockId;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileEntity;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileRecordId;
 import com.spike.giantdataanalysis.sequences.filesystem.exception.FileCatalogException;
 
 /**
  * File Catalog Manager.
- * <p>
- * Operate on <code>STORE</code>, <code>basic_file_descriptor</code>.
  */
-@Deprecated
 public class FileCatalogManager {
-
   private static final Logger LOG = LoggerFactory.getLogger(FileCatalogManager.class);
 
-  private FileSystemCatalogConfiguration configuration;
+  private final FileSystemConfiguration configuration;
 
-  // STORE/DISK, basic_file_descriptor
-  private STORE storeCache;
-  private LinkedList<basic_file_descriptor> fileDescriptorCache = Lists.newLinkedList();
+  private static final Map<String, Integer> FILE_ID_CACHE = Maps.newConcurrentMap();
+  private static RandomAccessFile FILE_ID_RAF;
+  private static final AtomicInteger FILENO_SEQUENCE = new AtomicInteger(0);
 
-  // FIXME(zhoujiagen) reader/writer not work here, use RandomAccessFile instead
-  private RandomAccessFile storeCatelogRAF;
-  private RandomAccessFile fdCatalogRAF;
+  /** file name => file entity. */
+  private static final Map<String, FileEntity> FILE_CACHE = Maps.newConcurrentMap();
 
-  private enum Catalog {
-    STORE, FD
-  }
-
-  public FileCatalogManager(FileSystemCatalogConfiguration configuration) {
+  public FileCatalogManager(FileSystemConfiguration configuration) {
     this.configuration = configuration;
 
-    this.initialize();
-  }
-
-  public synchronized boolean initialize() {
-    LOG.info("file catalog manager initialize start.");
-
-    // reload the file descriptors from store after reboot
-    File storeCatalogFile = this.getOrCreateFile(Catalog.STORE);
-    File fdCatalogFile = this.getOrCreateFile(Catalog.FD);
+    FileSystemCatalogConfiguration conf = configuration.getCatalogConfiguration();
+    Preconditions.checkState(Paths.get(conf.getCatalogRootDir()).toFile().isDirectory());
 
     try {
-      storeCatelogRAF = new RandomAccessFile(storeCatalogFile, "rwd");
-      fdCatalogRAF = new RandomAccessFile(fdCatalogFile, "rwd");
+      FILE_ID_RAF = new RandomAccessFile(
+          Paths.get(conf.getCatalogRootDir(), conf.getFileIdFileName()).toFile(), "rwd");
+    } catch (FileNotFoundException e) {
+      throw FileCatalogException.newE(e);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // file id cache
+  // ---------------------------------------------------------------------------
+
+  public synchronized void initialize() {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("file catalog manager initialize start.");
+    }
+
+    try {
+      String line = null;
+      int maxFileId = -1;
+      while ((line = FILE_ID_RAF.readLine()) != null) {
+        List<String> list = Splitter.on("=").splitToList(line);
+        int fieldId = Integer.parseInt(list.get(1));
+        FILE_ID_CACHE.put(list.get(0), fieldId);
+        if (fieldId > maxFileId) {
+          maxFileId = fieldId;
+        }
+      }
+      FILENO_SEQUENCE.set(maxFileId + 1);
+
     } catch (IOException e) {
-      LOG.error(e.getMessage(), e);
       throw FileCatalogException.newE(e);
     }
 
-    LOG.info("file catalog manager initialize finished.");
-    return true;
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("file catalog manager initialize finished.");
+    }
   }
 
-  private File getOrCreateFile(Catalog catalog) {
-    File result = null;
+  public int getOrCreateFileId(String filename) {
+    Integer result = FILE_ID_CACHE.get(filename);
 
-    File catalogDirFile = new File(configuration.catalogRootDir);
-    if (!catalogDirFile.isDirectory() || !catalogDirFile.exists()) {
-      throw FileCatalogException.newE("invalid catalogDir");
+    if (result != null) {
+      return result;
+    } else {
+      result = FILENO_SEQUENCE.getAndIncrement();
+      FILE_ID_CACHE.put(filename, result);
+      persistent();
     }
-
-    String prefix = null;
-    switch (catalog) {
-    case STORE: {
-      prefix = configuration.storeFilePreix;
-      break;
-    }
-    case FD: {
-      prefix = configuration.fileDescriptorFilePrefix;
-      break;
-    }
-    default:
-      throw FileCatalogException.newE(new UnsupportedOperationException());
-    }
-
-    final String catalogFilePrefix = prefix;
-    try {
-      File[] catalogFiles = catalogDirFile.listFiles(new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return name.startsWith(catalogFilePrefix);
-        }
-      });
-      if (catalogFiles == null || catalogFiles.length == 0) {
-        String filename = catalogFilePrefix + Strings.padStart("", configuration.nameLength, '0');
-        result = new File(catalogDirFile, filename);
-        if (!result.createNewFile()) {
-          throw FileCatalogException.newE("create " + filename + " failed");
-        }
-      } else {
-        // attach to the last one
-        result = catalogFiles[catalogFiles.length - 1];
-      }
-
-      // init cache
-      for (File file : catalogFiles) {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-          if (Catalog.STORE.equals(catalog)) {
-            storeCache = STORE.NULL.fromString(line); // only one line
-            break;
-          } else if (Catalog.FD.equals(catalog)) {
-            fileDescriptorCache.add(basic_file_descriptor.NULL.fromString(line));
-          }
-        }
-        reader.close();
-      }
-
-    } catch (Exception e) {
-      throw FileCatalogException.newE(e);
-    }
-
     return result;
   }
 
-  public boolean addFD(basic_file_descriptor fileDescriptor) {
-
-    throw new UnsupportedOperationException();
+  public FileBlockId getOrCreateBlockId(String filename, int blockIndex) {
+    int fileId = this.getOrCreateFileId(filename);
+    return new FileBlockId(fileId, blockIndex);
   }
 
-  public basic_file_descriptor getFD(String filename) {
-    for (basic_file_descriptor fd : fileDescriptorCache) {
-      if (fd.filename.equals(filename)) {
-        return fd;
-      }
+  public FileRecordId getOrCreateRecordId(String filename, int blockIndex, int recordIndex) {
+    int fileId = this.getOrCreateFileId(filename);
+    return new FileRecordId(new FileBlockId(fileId, blockIndex), recordIndex);
+  }
+
+  private synchronized void persistent() {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("persistent file catalog.");
     }
-    return null;
+    try {
+      FILE_ID_RAF.seek(0);
+      FILE_ID_RAF.setLength(0);
+
+      for (String fileName : FILE_ID_CACHE.keySet()) {
+        FILE_ID_RAF.writeChars(//
+          fileName + "=" + FILE_ID_CACHE.get(fileName) + System.lineSeparator());
+      }
+      FILE_ID_RAF.getFD().sync();
+    } catch (IOException e) {
+      throw FileCatalogException.newE(e);
+    }
   }
 
-  public boolean deleteFD(basic_file_descriptor fileDescriptor) {
-    throw new UnsupportedOperationException();
+  // ---------------------------------------------------------------------------
+  // file name cache
+  // ---------------------------------------------------------------------------
+
+  public FileSystemConfiguration getConfiguration() {
+    return configuration;
   }
 
-  public boolean updateFD(basic_file_descriptor fileDescriptor) {
-    throw new UnsupportedOperationException();
+  public void cacheFile(String filename, FileEntity fileEntity) {
+    FILE_CACHE.put(filename, fileEntity);
   }
 
+  public FileEntity queryFileCache(String filename) {
+    return FILE_CACHE.get(filename);
+  }
+
+  public void removeFileCache(String filename) {
+    FILE_CACHE.remove(filename);
+  }
 }

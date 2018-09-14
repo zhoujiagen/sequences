@@ -1,9 +1,11 @@
 package com.spike.giantdataanalysis.sequences.filesystem.core;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.nio.channels.FileLock;
+import java.nio.channels.NonWritableChannelException;
 
-import com.spike.giantdataanalysis.sequences.filesystem.FileAccessModeEnum;
+import com.spike.giantdataanalysis.sequences.filesystem.exception.FileSystemException;
 
 /**
  * File Abstraction.
@@ -11,7 +13,7 @@ import com.spike.giantdataanalysis.sequences.filesystem.FileAccessModeEnum;
 public class FileEntity {
   private String name;
   private int number; // unique in file system
-  private ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+
   private RandomAccessFile handler;
   private FileAccessModeEnum accessMode;
 
@@ -59,12 +61,35 @@ public class FileEntity {
     this.number = number;
   }
 
-  public ReentrantReadWriteLock getLock() {
-    return lock;
+  /**
+   * acquire lock of file channel.
+   * @return may be null when call on readable file channel
+   */
+  public FileLock lock() {
+    try {
+      return handler.getChannel().lock();
+    } catch (NonWritableChannelException e) {
+      return null;
+    } catch (IOException e) {
+      throw FileSystemException.newE(e);
+    }
   }
 
-  public void setLock(ReentrantReadWriteLock lock) {
-    this.lock = lock;
+  /**
+   * acquire region lock of file channel.
+   * @param position
+   * @param size
+   * @param shared
+   * @return may be null when call on readable file channel
+   */
+  public FileLock lock(long position, long size, boolean shared) {
+    try {
+      return handler.getChannel().lock(position, size, shared);
+    } catch (NonWritableChannelException e) {
+      return null;
+    } catch (IOException e) {
+      throw FileSystemException.newE(e);
+    }
   }
 
   public RandomAccessFile getHandler() {

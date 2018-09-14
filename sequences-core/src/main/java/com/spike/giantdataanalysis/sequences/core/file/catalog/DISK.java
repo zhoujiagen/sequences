@@ -14,15 +14,15 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.spike.giantdataanalysis.sequences.serialize.Dumpable;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
 import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.Ops;
+import com.spike.giantdataanalysis.sequences.serialize.Stringable;
 
 /**
  * Disk with addressing tuple: (磁盘标识diskid, 柱面号cylinderno, 磁道号trackno, 槽号slotno).
  * <p>
  * WARNIG: just a mocking object.
  */
-public class DISK implements Dumpable, MoreSerializable.Stringable<DISK> {
+public class DISK implements Dumpable, Stringable<DISK> {
   private static final long serialVersionUID = 1L;
 
   public static DISK NULL = new DISK(0);

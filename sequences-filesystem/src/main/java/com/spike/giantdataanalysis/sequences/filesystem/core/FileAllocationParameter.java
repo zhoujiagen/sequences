@@ -1,4 +1,4 @@
-package com.spike.giantdataanalysis.sequences.filesystem;
+package com.spike.giantdataanalysis.sequences.filesystem.core;
 
 /**
  * File Allocation Parameter.

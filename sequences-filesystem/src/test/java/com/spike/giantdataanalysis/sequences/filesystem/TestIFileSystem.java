@@ -1,9 +1,9 @@
 package com.spike.giantdataanalysis.sequences.filesystem;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Date;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -13,12 +13,12 @@ import org.junit.Test;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Bytes;
 import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
-import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
-import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.filesystem.configuration.FileSystemConfiguration;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileAccessModeEnum;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileBlockEntity;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileBlockHeader;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileEntity;
+import com.spike.giantdataanalysis.sequences.filesystem.core.cache.FileSystemCache;
 import com.spike.giantdataanalysis.sequences.filesystem.exception.FileSystemException;
 
 public class TestIFileSystem {
@@ -30,6 +30,7 @@ public class TestIFileSystem {
   private FileSystemConfiguration fileSystemConfiguration = new FileSystemConfiguration();
   private IFileSystem fileSystem;
   private static final String FILE_NAME = "target/test.txt";
+  private static final String CATALOG_DIR_NAME = "target/catalog/";
   private FileEntity fileEntity;
 
   private int blockSizeInByte;
@@ -37,9 +38,17 @@ public class TestIFileSystem {
   @Before
   public void before() {
     Paths.get(FILE_NAME).toFile().delete();
+    File catalogDir = Paths.get(CATALOG_DIR_NAME).toFile();
+    if (!catalogDir.exists()) {
+      catalogDir.mkdir();
+    }
+    for (File catalogFile : catalogDir.listFiles()) {
+      catalogFile.delete();
+    }
     Preconditions.checkArgument(!Paths.get(FILE_NAME).toFile().exists());
-    blockSizeInByte = fileSystemConfiguration.catalogConfiguration.blockSizeInByte;
-    fileSystem = new LocalFileSystem(fileSystemConfiguration);
+    blockSizeInByte = fileSystemConfiguration.getCatalogConfiguration().getBlockSizeInByte();
+    FileCatalogManager fileCatalogManager = new FileCatalogManager(fileSystemConfiguration);
+    fileSystem = new LocalFileSystem(fileCatalogManager);
     fileSystem.create(FILE_NAME, null);
   }
 
@@ -48,6 +57,8 @@ public class TestIFileSystem {
     dumpFile();
     fileSystem.close(fileEntity);
     Paths.get(FILE_NAME).toFile().deleteOnExit();
+
+    FileSystemCache.I().clear();
   }
 
   private void dumpFile() {
@@ -55,10 +66,12 @@ public class TestIFileSystem {
     try (FileInputStream fis = new FileInputStream(FILE_NAME);) {
       byte[] b = new byte[blockSizeInByte];
       int readByteCount = 0;
+      int blockIndex = 0;
       while ((readByteCount = fis.read(b)) > 0) {
-        FileBlockHeader fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+        FileBlockHeader fileBlockHeader =
+            FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity, blockIndex++));
         System.out.println(
-          FileBlockHeader.fromBytes(MoreBytes.copy(b, 0, fileBlockHeader.getReprByteSize())));
+          fileBlockHeader.fromBytes(MoreBytes.copy(b, 0, fileBlockHeader.getReprByteSize())));
         System.out.println(MoreBytes.toHex(b, 0, readByteCount));
       }
     } catch (Exception e) {
@@ -85,18 +98,29 @@ public class TestIFileSystem {
   // ---------------------------------------------------------------------------
 
   @Test
+  public void testOpen() {
+    Preconditions.checkArgument(Paths.get(FILE_NAME).toFile().exists());
+
+    fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.A);
+    int fileNumber = fileEntity.getNumber();
+    fileSystem.close(fileEntity);
+
+    fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.R);
+    Assert.assertEquals(fileNumber, fileEntity.getNumber());
+  }
+
+  @Test
   public void testWriteSimple() throws IOException {
     Preconditions.checkArgument(Paths.get(FILE_NAME).toFile().exists());
 
     // write in block 0
     fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.U);
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
+    FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, 0);
     String content = "hello, there!\n";
     fileBlockEntity.setData(content.getBytes());
-    fileSystem.write(fileEntity, 0, fileBlockEntity);
+    fileSystem.write(fileEntity, 0, content.getBytes());
 
-    fileEntity.getHandler().seek(0);
-    FileBlockHeader fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+    FileBlockHeader fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
     Assert.assertEquals(0, fileBlockHeader.getBlockSizeType());
     Assert.assertEquals(content.length() + fileBlockHeader.getReprByteSize(),
       fileBlockHeader.getFreeByteOffset());
@@ -104,10 +128,10 @@ public class TestIFileSystem {
     // write in block 1
     content = "hello, there!!!\n";
     fileBlockEntity.setData(content.getBytes());
-    fileSystem.write(fileEntity, 1, fileBlockEntity);
+    fileBlockEntity = new FileBlockEntity(fileEntity, 1);
+    fileSystem.write(fileEntity, 1, content.getBytes());
 
-    fileEntity.getHandler().seek(blockSizeInByte);
-    fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+    fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
     Assert.assertEquals(0, fileBlockHeader.getBlockSizeType());
     Assert.assertEquals(content.length() + fileBlockHeader.getReprByteSize(),
       fileBlockHeader.getFreeByteOffset());
@@ -122,9 +146,9 @@ public class TestIFileSystem {
     data[data.length - 1] = 0xF;
 
     fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.U);
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
+    FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, 0);
     fileBlockEntity.setData(data);
-    fileSystem.write(fileEntity, 0, fileBlockEntity);
+    fileSystem.write(fileEntity, 0, data);
   }
 
   @Test
@@ -138,17 +162,16 @@ public class TestIFileSystem {
     data[data.length - 1] = 0xF;
 
     fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.U);
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
+    FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, 0);
     fileBlockEntity.setData(data);
-    fileSystem.writec(fileEntity, 0, fileBlockEntity);
+    fileSystem.writec(fileEntity, 0, data);
 
-    fileEntity.getHandler().seek(0);
-    FileBlockHeader fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+    FileBlockHeader fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
     Assert.assertEquals(0, fileBlockHeader.getBlockSizeType());
     Assert.assertEquals(blockSizeInByte, fileBlockHeader.getFreeByteOffset()); // 4096 = 2 + 4094
 
-    fileEntity.getHandler().seek(blockSizeInByte);
-    fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+    fileBlockEntity = new FileBlockEntity(fileEntity, 1);
+    fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
     Assert.assertEquals(0, fileBlockHeader.getBlockSizeType());
     Assert.assertEquals(6, fileBlockHeader.getFreeByteOffset()); // 6 = 2 + 4
   }
@@ -160,9 +183,9 @@ public class TestIFileSystem {
     // write
     byte[] data = "hello, there!!!".getBytes();
     fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.U);
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
+    FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, 0);
     fileBlockEntity.setData(data);
-    fileSystem.writec(fileEntity, 0, fileBlockEntity);
+    fileSystem.writec(fileEntity, 0, data);
     fileSystem.close(fileEntity);
 
     // read
@@ -179,11 +202,11 @@ public class TestIFileSystem {
     byte[] data = "hello, there!!!".getBytes();
     byte[] writedData = new byte[0];
     int times = 3;
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
     fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.A);
+    FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, 0);
     for (int i = 0; i < times; i++) {
       fileBlockEntity.setData(data);
-      fileSystem.write(fileEntity, 0, fileBlockEntity);
+      fileSystem.write(fileEntity, 0, data);
       writedData = Bytes.concat(writedData, data);
     }
     fileSystem.close(fileEntity);
@@ -200,10 +223,10 @@ public class TestIFileSystem {
 
     // write
     fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.U);
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
+    FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, 0);
     byte[] wdata = new byte[] { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf }; // 8
     fileBlockEntity.setData(wdata);
-    fileSystem.write(fileEntity, 0, fileBlockEntity);
+    fileSystem.write(fileEntity, 0, wdata);
     fileSystem.close(fileEntity);
 
     // append
@@ -215,52 +238,18 @@ public class TestIFileSystem {
 
     fileEntity = fileSystem.open(FILE_NAME, FileAccessModeEnum.A);
     fileBlockEntity.setData(data);
-    fileSystem.writec(fileEntity, 0, fileBlockEntity);
+    fileSystem.writec(fileEntity, 0, data);
 
     // read block header
-    fileEntity.getHandler().seek(0);
-    FileBlockHeader fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+    fileBlockEntity = new FileBlockEntity(fileEntity, 0);
+    FileBlockHeader fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
     Assert.assertEquals(0, fileBlockHeader.getBlockSizeType());
     Assert.assertEquals(blockSizeInByte, fileBlockHeader.getFreeByteOffset()); // 4096 = 2 + 4094
 
-    fileEntity.getHandler().seek(blockSizeInByte);
-    fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+    fileBlockEntity = new FileBlockEntity(fileEntity, 1);
+    fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
     Assert.assertEquals(0, fileBlockHeader.getBlockSizeType());
     Assert.assertEquals(14, fileBlockHeader.getFreeByteOffset()); // 14 = 4098+8-4094 +2
-  }
-
-  static void write_log() throws Exception {
-    FileSystemConfiguration configuration = new FileSystemConfiguration();
-    IFileSystem fs = new LocalFileSystem(configuration);
-
-    String base = "target/";
-    String filename = base + "hello.txt";
-    fs.create(filename, null);
-
-    FileEntity fileEntity = fs.open(filename, FileAccessModeEnum.U);
-
-    System.out.println("=== write");
-    String content = "hello, there!";
-    LogRecord logRecord = new LogRecord();
-    logRecord.lsn = LSN.NULL;
-    logRecord.prev_lsn = LSN.NULL;
-    logRecord.timestamp = new Date().getTime();
-    logRecord.rmid = 1;
-    logRecord.txnid = 1;
-    logRecord.txn_prev_lsn = LSN.NULL;
-    logRecord.length = content.length();
-    logRecord.body = content.getBytes();
-
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
-    fileBlockEntity
-        .setData(Bytes.concat(logRecord.asString().getBytes(), System.lineSeparator().getBytes()));
-    fs.write(fileEntity, -2, fileBlockEntity);
-
-    System.out.println("=== read again");
-    fs.close(fileEntity);
-    fileEntity = fs.open(filename, FileAccessModeEnum.R);
-    fileBlockEntity = fs.read(fileEntity, 0);
-    System.out.println(new String(fileBlockEntity.getData()));
   }
 
 }

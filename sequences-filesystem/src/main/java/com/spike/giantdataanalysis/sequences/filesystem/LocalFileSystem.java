@@ -3,10 +3,9 @@ package com.spike.giantdataanalysis.sequences.filesystem;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.SyncFailedException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -15,24 +14,19 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.spike.giantdataanalysis.sequences.commons.bytes.MoreBytes;
 import com.spike.giantdataanalysis.sequences.filesystem.configuration.FileSystemConfiguration;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileAccessModeEnum;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileAllocationParameter;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileBlockEntity;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileBlockHeader;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileEntity;
+import com.spike.giantdataanalysis.sequences.filesystem.core.cache.CacheTargetEnum;
+import com.spike.giantdataanalysis.sequences.filesystem.core.cache.FileSystemCache;
 import com.spike.giantdataanalysis.sequences.filesystem.exception.FileSystemException;
 
 /**
  * File System implemented in Java: just a demonstration.
- * <p>
- * BLOCK ORGANIZATION(4KB): (bits)
- * 
- * <pre>
- * ------------------------------------------------------------------------------------------------
- * BLOCK START | BLOCK_SIZE(2)| FREE offset(13) | RECORD ...
- * ------------------------------------------------------------------------------------------------
- * </pre>
  */
 public class LocalFileSystem implements IFileSystem {
 
@@ -45,18 +39,16 @@ public class LocalFileSystem implements IFileSystem {
   private FileSystemConfiguration configuration;
   private int blockSizeInByte;
 
-  /** file name => file entity. */
-  private static final Map<String, FileEntity> FILE_CACHE = Maps.newConcurrentMap();
-  /** file number counter. */
-  private static final AtomicInteger FILENO_SEQUENCE = new AtomicInteger(0);
+  private final FileCatalogManager fileCatalogManager;
 
   // ---------------------------------------------------------------------------
   // constructor
   // ---------------------------------------------------------------------------
 
-  public LocalFileSystem(FileSystemConfiguration configuration) {
-    this.configuration = configuration;
-    this.blockSizeInByte = configuration.catalogConfiguration.blockSizeInByte;
+  public LocalFileSystem(FileCatalogManager fileCatalogManager) {
+    this.fileCatalogManager = fileCatalogManager;
+    this.configuration = fileCatalogManager.getConfiguration();
+    this.blockSizeInByte = configuration.getCatalogConfiguration().getBlockSizeInByte();
 
     validateConfiguration();
   }
@@ -103,7 +95,6 @@ public class LocalFileSystem implements IFileSystem {
   @Override
   public FileEntity open(String filename, FileAccessModeEnum accessMode) {
 
-    FileEntity result = new FileEntity(filename, accessMode);
     if (LOG.isDebugEnabled()) {
       LOG.debug("open {} with mode: {}", filename, accessMode);
     }
@@ -115,25 +106,30 @@ public class LocalFileSystem implements IFileSystem {
       }
     }
 
-    FileEntity fileEntity = queryFileCache(filename);
-    if (fileEntity != null && fileEntity.getAccessMode() != null
-        && FileAccessModeEnum.isCompatible(fileEntity.getAccessMode(), accessMode)) {
-      throw FileSystemException.newE("file " + filename + " has been opened with mode: "
-          + fileEntity.getAccessMode() + ", so cannot be opened with mode: " + accessMode + "!");
+    FileEntity fileEntity = fileCatalogManager.queryFileCache(filename);
+    if (fileEntity != null) {
+      Preconditions.checkState(
+        fileEntity.getAccessMode() != null
+            && FileAccessModeEnum.isCompatible(fileEntity.getAccessMode(), accessMode), //
+        "file " + filename + " has been opened with mode: " + fileEntity.getAccessMode()
+            + ", so cannot be opened with mode: " + accessMode + "!");
+      return fileEntity;
     }
 
+    fileEntity = new FileEntity(filename, accessMode);
+
     try {
-      result.setHandler(new RandomAccessFile(file, accessMode.rafMode()));
+      fileEntity.setHandler(new RandomAccessFile(file, accessMode.rafMode()));
       if (FileAccessModeEnum.A.equals(accessMode)) {
-        result.getHandler().seek(result.getHandler().length());
+        fileEntity.getHandler().seek(fileEntity.getHandler().length());
       }
-      FILE_CACHE.put(filename, result);
     } catch (IOException e) {
       throw FileSystemException.newE(e);
     }
 
-    result.setNumber(FILENO_SEQUENCE.getAndIncrement());
-    return result;
+    fileEntity.setNumber(fileCatalogManager.getOrCreateFileId(filename));
+    fileCatalogManager.cacheFile(filename, fileEntity);
+    return fileEntity;
   }
 
   @Override
@@ -144,7 +140,7 @@ public class LocalFileSystem implements IFileSystem {
 
     try {
       fileEntity.getHandler().close();
-      removeFileCache(fileEntity.getName());
+      fileCatalogManager.removeFileCache(fileEntity.getName());
     } catch (IOException e) {
       throw FileSystemException.newE(e);
     }
@@ -157,20 +153,22 @@ public class LocalFileSystem implements IFileSystem {
 
   @Override
   public FileBlockEntity read(FileEntity fileEntity, int blockIndex) {
-    FileBlockEntity result = new FileBlockEntity();
+    FileBlockEntity result = new FileBlockEntity(fileEntity, blockIndex);
     if (LOG.isDebugEnabled()) {
       LOG.debug("read file {}", fileEntity);
     }
 
-    ReadLock rLock = fileEntity.getLock().readLock();
-    rLock.lock();
+    ReadLock rLock = null;
     try {
 
       int startBlockByteOffset = blockSizeInByte * blockIndex;
 
       fileEntity.getHandler().seek(startBlockByteOffset);
-      FileBlockHeader blockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+      FileBlockHeader blockHeader = FileBlockHeader.from(blockSizeInByte, result);
       result.setHeader(blockHeader);
+
+      rLock = blockHeader.lock().readLock();
+      rLock.lock();
       int headerByteSize = blockHeader.getReprByteSize();
       // fileEntity.getHandler().skipBytes(headerByteSize);
       fileEntity.getHandler().seek(startBlockByteOffset + headerByteSize);
@@ -188,7 +186,9 @@ public class LocalFileSystem implements IFileSystem {
     } catch (IOException e) {
       throw FileSystemException.newE(e);
     } finally {
-      rLock.unlock();
+      if (rLock != null) {
+        rLock.unlock();
+      }
     }
 
     return result;
@@ -196,17 +196,20 @@ public class LocalFileSystem implements IFileSystem {
 
   @Override
   public FileBlockEntity readLine(FileEntity fileEntity, int blockIndex) {
-    FileBlockEntity result = new FileBlockEntity();
+    FileBlockEntity result = new FileBlockEntity(fileEntity, blockIndex);
     if (LOG.isDebugEnabled()) {
       LOG.debug("read file next line {}", fileEntity);
     }
 
-    ReadLock rLock = fileEntity.getLock().readLock();
-    rLock.lock();
+    ReadLock rLock = null;
+
     try {
       fileEntity.getHandler().seek(blockSizeInByte * blockIndex);
-      FileBlockHeader blockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+      FileBlockHeader blockHeader = FileBlockHeader.from(blockSizeInByte, result);
       result.setHeader(blockHeader);
+
+      rLock = blockHeader.lock().readLock();
+      rLock.lock();
       String line = fileEntity.getHandler().readLine();
       if (line != null) {
         result.setData(line.getBytes());
@@ -214,7 +217,9 @@ public class LocalFileSystem implements IFileSystem {
     } catch (IOException e) {
       throw FileSystemException.newE(e);
     } finally {
-      rLock.unlock();
+      if (rLock != null) {
+        rLock.unlock();
+      }
     }
 
     return result;
@@ -225,16 +230,19 @@ public class LocalFileSystem implements IFileSystem {
   public List<FileBlockEntity> readc(FileEntity fileEntity, int blockIndex, int blockCount) {
     List<FileBlockEntity> result = Lists.newArrayList();
 
-    ReadLock rLock = fileEntity.getLock().readLock();
-    rLock.lock();
+    ReadLock rLock = null;
+
     try {
       fileEntity.getHandler().seek(blockSizeInByte * blockIndex);
       for (int i = 0; i < blockCount; i++) {
-        FileBlockEntity fileBlockEntity = new FileBlockEntity();
+        FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, blockIndex + i);
         byte[] bytes = new byte[blockSizeInByte];
         fileEntity.getHandler().seek(blockSizeInByte * blockIndex);
-        FileBlockHeader blockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+        FileBlockHeader blockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
         fileBlockEntity.setHeader(blockHeader);
+
+        rLock = blockHeader.lock().readLock();
+        rLock.lock();
         int readByteCount = fileEntity.getHandler().read(bytes, 0, blockSizeInByte);
         if (readByteCount != -1) {
           fileBlockEntity.setData(MoreBytes.copy(bytes, 0, readByteCount));
@@ -246,17 +254,18 @@ public class LocalFileSystem implements IFileSystem {
     } catch (IOException e) {
       throw FileSystemException.newE(e);
     } finally {
-      rLock.unlock();
+      if (rLock != null) {
+        rLock.unlock();
+      }
     }
 
     return result;
   }
 
   @Override
-  public void write(FileEntity fileEntity, int blockIndex, FileBlockEntity fileBlockEntity) {
+  public void write(FileEntity fileEntity, int blockIndex, byte[] data) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("write to file {}, content = {}", fileEntity,
-        new String(fileBlockEntity.getData()));
+      LOG.debug("write to file {}, content = {}", fileEntity, new String(data));
     }
 
     if (fileEntity.getAccessMode() == FileAccessModeEnum.R) {
@@ -264,31 +273,33 @@ public class LocalFileSystem implements IFileSystem {
           .newE("invalid operation: cannot write when using read access mode!");
     }
 
-    WriteLock wLock = fileEntity.getLock().writeLock(); // WARN: too raw lock!!!
-    wLock.lock();
+    WriteLock wLock = null;
     try {
       int blockStartByteOffset = blockSizeInByte * blockIndex;
       int blockEndByteOffset = blockStartByteOffset + blockSizeInByte;
       fileEntity.getHandler().seek(blockStartByteOffset);
 
       // read file block header
-      FileBlockHeader fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+      FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, blockIndex);
+      FileBlockHeader fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
 
-      int toWriteByteCount = fileBlockEntity.getData().length;
+      wLock = fileBlockHeader.lock().writeLock();
+      wLock.lock();
+      int toWriteByteCount = data.length;
       if (fileBlockHeader.getFreeByteOffset() + toWriteByteCount > blockEndByteOffset) {
         throw FileSystemException.newE("no enough space in block: use [writec] instead!");
       }
 
+      // append
       if (FileAccessModeEnum.A.equals(fileEntity.getAccessMode())) {
-
         fileEntity.getHandler().seek(blockStartByteOffset + fileBlockHeader.getFreeByteOffset());
-        fileEntity.getHandler().write(fileBlockEntity.getData(), 0, toWriteByteCount);
+        fileEntity.getHandler().write(data, 0, toWriteByteCount);
         fileBlockHeader.setFreeOffset(toWriteByteCount + fileBlockHeader.getFreeByteOffset());
-
-      } else if (FileAccessModeEnum.U.equals(fileEntity.getAccessMode())) {
-
+      }
+      // overwrite
+      else if (FileAccessModeEnum.U.equals(fileEntity.getAccessMode())) {
         fileEntity.getHandler().seek(blockStartByteOffset + fileBlockHeader.getReprByteSize());
-        fileEntity.getHandler().write(fileBlockEntity.getData(), 0, toWriteByteCount);
+        fileEntity.getHandler().write(data, 0, toWriteByteCount);
         fileBlockHeader.setFreeOffset(toWriteByteCount + fileBlockHeader.getReprByteSize());
       }
 
@@ -298,39 +309,49 @@ public class LocalFileSystem implements IFileSystem {
       }
       fileEntity.getHandler().seek(blockStartByteOffset);
       fileEntity.getHandler().write(fileBlockHeader.toBytes());
+      // update cache
+      FileSystemCache.I().put(CacheTargetEnum.FILE_BLOCK, fileBlockEntity, fileBlockHeader);
 
     } catch (Exception e) {
       throw FileSystemException.newE(e);
     } finally {
-      wLock.unlock();
+      if (wLock != null) {
+        wLock.unlock();
+      }
     }
 
   }
 
   @Override
-  public void writec(FileEntity fileEntity, int blockIndex, FileBlockEntity fileBlockEntity) {
+  public void writec(FileEntity fileEntity, int blockIndex, byte[] data) {
 
     if (fileEntity.getAccessMode() == FileAccessModeEnum.R) {
       throw FileSystemException
           .newE("invalid operation: cannot write when using read access mode!");
     }
 
-    WriteLock wLock = fileEntity.getLock().writeLock(); // WARN: too raw lock!!!
-    wLock.lock();
+    WriteLock wLock = null;
+
     try {
       final int blockStartByteOffset = blockSizeInByte * blockIndex;
-      final int totalByteCount = fileBlockEntity.getData().length;
+      final int totalByteCount = data.length;
 
       // [1] overwrite
       if (FileAccessModeEnum.U.equals(fileEntity.getAccessMode())) {
 
         int currentBlockStartByteOffset = blockStartByteOffset;
         int currentWriteByteIndex = 0;
+        int currentBlockIndex = blockIndex;
         while (currentWriteByteIndex < totalByteCount) {
+
+          // clean cache
+          FileSystemCache.I().remove(CacheTargetEnum.FILE_BLOCK,
+            new FileBlockEntity(fileEntity, currentBlockIndex));
 
           // read file block header
           fileEntity.getHandler().seek(currentBlockStartByteOffset);
-          FileBlockHeader fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+          FileBlockHeader fileBlockHeader = FileBlockHeader.from(blockSizeInByte,
+            new FileBlockEntity(fileEntity, currentBlockIndex));
 
           int currentWriteByteCount = blockSizeInByte - fileBlockHeader.getReprByteSize();
 
@@ -344,8 +365,9 @@ public class LocalFileSystem implements IFileSystem {
           if (LOG.isDebugEnabled()) {
             LOG.debug("write {} bytes to {}", currentWriteByteCount, fileEntity);
           }
-          fileEntity.getHandler().write(fileBlockEntity.getData(), currentWriteByteIndex,
-            currentWriteByteCount);
+          wLock = fileBlockHeader.lock().writeLock();
+          wLock.lock();
+          fileEntity.getHandler().write(data, currentWriteByteIndex, currentWriteByteCount);
 
           // update file block header
           fileBlockHeader
@@ -355,10 +377,13 @@ public class LocalFileSystem implements IFileSystem {
             LOG.debug("update block header {} to file {} ", fileBlockHeader, fileEntity);
           }
           fileEntity.getHandler().write(fileBlockHeader.toBytes());
+          FileSystemCache.I().put(CacheTargetEnum.FILE_BLOCK,
+            new FileBlockEntity(fileEntity, currentBlockIndex), fileBlockHeader);
 
           // update loop parameter
           currentWriteByteIndex += currentWriteByteCount;
           currentBlockStartByteOffset += blockSizeInByte;
+          currentBlockIndex++;
         }
       }
 
@@ -371,16 +396,20 @@ public class LocalFileSystem implements IFileSystem {
         // read file block header to find empty block to append all data
         fileEntity.getHandler().seek(currentBlockStartByteOffset);
         FileBlockHeader currentFileBlockHeader =
-            FileBlockHeader.fromHandler(fileEntity.getHandler());
+            FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity, blockIndex));
         fileEntity.getHandler().seek(nextBlockStartByteOffset);
-        FileBlockHeader nextFileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+        FileBlockHeader nextFileBlockHeader =
+            FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity, blockIndex + 1));
+
+        int currentBlockIndex = blockIndex;
         while (nextFileBlockHeader.getFreeByteOffset() > nextFileBlockHeader.getReprByteSize()) {
           currentBlockStartByteOffset += blockSizeInByte;
           currentFileBlockHeader = nextFileBlockHeader;
 
           nextBlockStartByteOffset += blockSizeInByte;
           fileEntity.getHandler().seek(nextBlockStartByteOffset);
-          nextFileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+          nextFileBlockHeader = FileBlockHeader.from(blockSizeInByte,
+            new FileBlockEntity(fileEntity, currentBlockIndex++));
         }
 
         // append data since currentFileBlockHeader
@@ -392,7 +421,11 @@ public class LocalFileSystem implements IFileSystem {
 
           // read file block header
           fileEntity.getHandler().seek(currentBlockStartByteOffset);
-          FileBlockHeader fileBlockHeader = FileBlockHeader.fromHandler(fileEntity.getHandler());
+          FileBlockHeader fileBlockHeader = FileBlockHeader.from(blockSizeInByte,
+            new FileBlockEntity(fileEntity, currentBlockIndex));
+
+          wLock = fileBlockHeader.lock().writeLock();
+          wLock.lock();
 
           int currentAppendByteCount = blockSizeInByte - fileBlockHeader.getFreeByteOffset();
 
@@ -406,8 +439,7 @@ public class LocalFileSystem implements IFileSystem {
           if (LOG.isDebugEnabled()) {
             LOG.debug("append {} bytes to {}", currentAppendByteCount, fileEntity);
           }
-          fileEntity.getHandler().write(fileBlockEntity.getData(), currentAppendByteIndex,
-            currentAppendByteCount);
+          fileEntity.getHandler().write(data, currentAppendByteIndex, currentAppendByteCount);
 
           // update file block header
           fileBlockHeader
@@ -417,10 +449,13 @@ public class LocalFileSystem implements IFileSystem {
             LOG.debug("update block header {} to file {} ", fileBlockHeader, fileEntity);
           }
           fileEntity.getHandler().write(fileBlockHeader.toBytes());
+          FileSystemCache.I().put(CacheTargetEnum.FILE_BLOCK,
+            new FileBlockEntity(fileEntity, currentBlockIndex), fileBlockHeader);
 
           // update loop parameter
           currentAppendByteIndex += currentAppendByteCount;
           currentBlockStartByteOffset += blockSizeInByte;
+          currentBlockIndex++;
         }
 
       }
@@ -428,7 +463,9 @@ public class LocalFileSystem implements IFileSystem {
     } catch (Exception e) {
       throw FileSystemException.newE(e);
     } finally {
-      wLock.unlock();
+      if (wLock != null) {
+        wLock.unlock();
+      }
     }
   }
 
@@ -437,18 +474,14 @@ public class LocalFileSystem implements IFileSystem {
     if (LOG.isDebugEnabled()) {
       LOG.debug("flush file {}, ", fileEntity);
     }
-  }
 
-  // ---------------------------------------------------------------------------
-  // helper methods
-  // ---------------------------------------------------------------------------
-
-  private FileEntity queryFileCache(String filename) {
-    return FILE_CACHE.get(filename);
-  }
-
-  private void removeFileCache(String filename) {
-    FILE_CACHE.remove(filename);
+    try {
+      fileEntity.getHandler().getFD().sync();
+    } catch (SyncFailedException e) {
+      throw FileSystemException.newE(e);
+    } catch (IOException e) {
+      throw FileSystemException.newE(e);
+    }
   }
 
 }

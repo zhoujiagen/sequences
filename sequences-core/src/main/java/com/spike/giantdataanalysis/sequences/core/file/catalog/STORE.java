@@ -11,10 +11,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.spike.giantdataanalysis.sequences.serialize.Dumpable;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
+import com.spike.giantdataanalysis.sequences.serialize.Stringable;
 
 // TODO(zhoujiagen) add support for extent allocaiton???
-public class STORE implements Dumpable, MoreSerializable.Stringable<STORE> {
+public class STORE implements Dumpable, Stringable<STORE> {
   private static final long serialVersionUID = 1L;
 
   public static STORE NULL = new STORE(new DISK());

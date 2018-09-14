@@ -30,23 +30,9 @@ public interface MoreSerializable {
   String BEGIN = "[[";
   String END = "]]";
 
-  // for performance critical
-  interface Byteable<T> extends Serializable {
-    byte[] toBytes();
 
-    int size();
 
-    T fromBytes(byte[] bytes);
-  }
 
-  // for more representative work
-  interface Stringable<T> extends Serializable {
-    String asString();
-
-    int size();
-
-    T fromString(String raw);
-  }
 
   class Ops {
     public static String[] to(long[] longs) {

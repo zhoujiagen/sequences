@@ -2,6 +2,8 @@ package com.spike.giantdataanalysis.sequences.filesystem;
 
 import java.util.List;
 
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileAccessModeEnum;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileAllocationParameter;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileBlockEntity;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileEntity;
 
@@ -74,17 +76,17 @@ public interface IFileSystem {
    * write from buffer in memeory to block in disk.
    * @param fileEntity
    * @param blockIndex
-   * @param fileBlockEntity
+   * @param data
    */
-  void write(FileEntity fileEntity, int blockIndex, FileBlockEntity fileBlockEntity);
+  void write(FileEntity fileEntity, int blockIndex, byte[] data);
 
   /**
    * write continuously from buffer in memeory to block in disk.
    * @param fileEntity
    * @param blockIndex
-   * @param fileBlockEntity
+   * @param data
    */
-  void writec(FileEntity fileEntity, int blockIndex, FileBlockEntity fileBlockEntity);
+  void writec(FileEntity fileEntity, int blockIndex, byte[] data);
 
   /**
    * flush to disk.

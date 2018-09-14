@@ -7,9 +7,9 @@ import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.S
 
 import com.google.common.base.Strings;
 import com.spike.giantdataanalysis.sequences.serialize.Dumpable;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
+import com.spike.giantdataanalysis.sequences.serialize.Stringable;
 
-public class EXTENT_ENTRY implements Dumpable, MoreSerializable.Stringable<EXTENT_ENTRY> {
+public class EXTENT_ENTRY implements Dumpable, Stringable<EXTENT_ENTRY> {
   private static final long serialVersionUID = 1L;
 
   public int first_slot = 0; // first slot index in this extent entry

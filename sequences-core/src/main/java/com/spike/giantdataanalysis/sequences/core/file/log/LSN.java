@@ -6,9 +6,9 @@ import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.L
 import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.SEP;
 
 import com.google.common.base.Strings;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
+import com.spike.giantdataanalysis.sequences.serialize.Stringable;
 
-public class LSN implements MoreSerializable.Stringable<LSN> {
+public class LSN implements Stringable<LSN> {
   private static final long serialVersionUID = 6268301188928797446L;
 
   // file no in directory

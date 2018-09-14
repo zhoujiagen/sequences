@@ -10,9 +10,9 @@ import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.S
 import java.util.Date;
 
 import com.google.common.base.Strings;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
+import com.spike.giantdataanalysis.sequences.serialize.Stringable;
 
-public class LogRecord implements MoreSerializable.Stringable<LogRecord> {
+public class LogRecord implements Stringable<LogRecord> {
   private static final long serialVersionUID = 6439536718753733691L;
 
   public LSN lsn = LSN.NULL;

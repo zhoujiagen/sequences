@@ -11,7 +11,7 @@ public class TestBitOperations {
   public void testFileBlockHeader_fromBytes() {
     byte[] b = new byte[] { (byte) 255, (byte) 255 };
     System.out.println(MoreBytes.toHex(b)); // ffff
-    FileBlockHeader fileBlockHeader = FileBlockHeader.fromBytes(b);
+    FileBlockHeader fileBlockHeader = FileBlockHeader.from(b);
     System.out.println(fileBlockHeader);
     Assert.assertEquals(3, fileBlockHeader.getBlockSizeType());
     Assert.assertEquals(8191, fileBlockHeader.getFreeByteOffset());

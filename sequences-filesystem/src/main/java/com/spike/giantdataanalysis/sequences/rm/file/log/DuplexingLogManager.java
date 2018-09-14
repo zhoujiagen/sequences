@@ -21,8 +21,8 @@ import com.spike.giantdataanalysis.sequences.core.file.log.LogAnchor;
 import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
 import com.spike.giantdataanalysis.sequences.exception.LogManagerException;
-import com.spike.giantdataanalysis.sequences.filesystem.FileAccessModeEnum;
 import com.spike.giantdataanalysis.sequences.filesystem.IFileSystem;
+import com.spike.giantdataanalysis.sequences.filesystem.core.FileAccessModeEnum;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileBlockEntity;
 import com.spike.giantdataanalysis.sequences.filesystem.core.FileEntity;
 import com.spike.giantdataanalysis.sequences.rm.file.ILogM;
@@ -211,11 +211,9 @@ public class DuplexingLogManager implements ILogM {
 
     current_lsn_a = new LSN(current_lsn_a.file, logRecord.lsn.rba + current_lsn_a.size());
 
-    FileBlockEntity fileBlockEntity = new FileBlockEntity();
-    fileBlockEntity
-        .setData(Bytes.concat(logRecord.asString().getBytes(), System.lineSeparator().getBytes()));
-    fileSystem.write(logfile_a, 0, fileBlockEntity);
-    fileSystem.write(logfile_b, 0, fileBlockEntity);
+    byte[] data = Bytes.concat(logRecord.asString().getBytes(), System.lineSeparator().getBytes());
+    fileSystem.write(logfile_a, 0, data);
+    fileSystem.write(logfile_b, 0, data);
 
     currentLogRecordSize++;
 

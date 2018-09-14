@@ -7,12 +7,12 @@ import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.I
 import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.SEP;
 
 import com.google.common.base.Strings;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
+import com.spike.giantdataanalysis.sequences.serialize.Stringable;
 
 /**
  * Allocation parameter.
  */
-public class allocparmp implements MoreSerializable.Stringable<allocparmp> {
+public class allocparmp implements Stringable<allocparmp> {
   private static final long serialVersionUID = 1L;
 
   public static allocparmp NULL = new allocparmp();
