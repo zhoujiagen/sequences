@@ -1,9 +1,9 @@
 package com.spike.giantdataanalysis.sequences.core.file.catalog;
 
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.BEGIN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.END;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.SEP;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.BEGIN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.END;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.SEP;
 
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -13,9 +13,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.spike.giantdataanalysis.sequences.serialize.Dumpable;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.Ops;
-import com.spike.giantdataanalysis.sequences.serialize.Stringable;
+import com.spike.giantdataanalysis.db.commons.serialize.Dumpable;
+import com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.Ops;
+import com.spike.giantdataanalysis.db.commons.serialize.Stringable;
 
 /**
  * Disk with addressing tuple: (磁盘标识diskid, 柱面号cylinderno, 磁道号trackno, 槽号slotno).

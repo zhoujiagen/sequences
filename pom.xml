@@ -3,35 +3,39 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.spike.giantdataanalysis</groupId>
-	<artifactId>sequences</artifactId>
+	<artifactId>db</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Sequences</name>
+	<name>Database RI</name>
 	<inceptionYear>2018</inceptionYear>
 
 	<modules>
+		<!-- commons: utilities -->
+		<module>db-commons</module>
+		<!-- filesystem: file, log, access path -->
+		<module>db-filesystem</module>
+
+
 		<!-- core: data structure -->
 		<module>sequences-core</module>
-		<!-- commons: utilities -->
-		<module>sequences-commons</module>
+		<module>sequences-filesystem</module>
 		<!-- locking: Lock -->
 		<module>sequences-locking</module>
-		<!-- filesystem: file, log, access path -->
-		<module>sequences-filesystem</module>
-
 		<!-- server: -->
 		<module>sequences-server</module>
 		<!-- tpservice: TP service -->
 		<module>sequences-tpservice</module>
 		<!-- tpos: TP operating system -->
 		<module>sequences-tpos</module>
-
 		<!-- query -->
 		<module>sequences-query</module>
-
 		<!-- api -->
 		<module>sequences-api</module>
+
+
+		<!-- SPARQL -->
+		<module>sparql</module>
 	</modules>
 
 	<licenses>

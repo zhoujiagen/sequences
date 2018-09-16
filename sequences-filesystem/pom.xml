@@ -1,14 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.spike.giantdataanalysis</groupId>
-		<artifactId>sequences</artifactId>
+		<artifactId>db</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>sequences-filesystem</artifactId>
+	<name>Sequences FileSystem</name>
 
 
 	<properties>
@@ -24,7 +24,13 @@
 
 		<dependency>
 			<groupId>com.spike.giantdataanalysis</groupId>
-			<artifactId>sequences-commons</artifactId>
+			<artifactId>db-filesystem</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.spike.giantdataanalysis</groupId>
+			<artifactId>commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

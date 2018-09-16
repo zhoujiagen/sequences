@@ -1,11 +1,11 @@
 package com.spike.giantdataanalysis.sequences.rm.file;
 
+import com.spike.giantdataanalysis.db.filesystem.IFileSystem;
+import com.spike.giantdataanalysis.db.filesystem.LocalFileSystem;
+import com.spike.giantdataanalysis.db.filesystem.core.FileAccessModeEnum;
 import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
 import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
 import com.spike.giantdataanalysis.sequences.core.support.ICJavaAdapter.OutParameter;
-import com.spike.giantdataanalysis.sequences.filesystem.IFileSystem;
-import com.spike.giantdataanalysis.sequences.filesystem.LocalFileSystem;
-import com.spike.giantdataanalysis.sequences.filesystem.core.FileAccessModeEnum;
 
 /**
  * Log manager.
