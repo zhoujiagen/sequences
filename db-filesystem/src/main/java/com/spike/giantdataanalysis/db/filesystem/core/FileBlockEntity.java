@@ -8,9 +8,10 @@ import com.spike.giantdataanalysis.db.commons.cache.CacheKey;
  */
 public class FileBlockEntity implements CacheKey {
 
-  private FileEntity fileEntity;
-  private int blockIndex;
-  private FileBlockHeader header;
+  private final FileEntity fileEntity;
+  private final int blockIndex;
+  private AbstractFileBlockHeader header;
+  private FileBlockTail tail;
   private byte[] data = new byte[0];
 
   public FileBlockEntity(FileEntity fileEntity, int blockIndex) {
@@ -51,11 +52,11 @@ public class FileBlockEntity implements CacheKey {
     return blockIndex;
   }
 
-  public FileBlockHeader getHeader() {
+  public AbstractFileBlockHeader getHeader() {
     return header;
   }
 
-  public void setHeader(FileBlockHeader header) {
+  public void setHeader(AbstractFileBlockHeader header) {
     this.header = header;
   }
 
@@ -65,6 +66,14 @@ public class FileBlockEntity implements CacheKey {
 
   public void setData(byte[] data) {
     this.data = data;
+  }
+
+  public FileBlockTail getTail() {
+    return tail;
+  }
+
+  public void setTail(FileBlockTail tail) {
+    this.tail = tail;
   }
 
   @Override

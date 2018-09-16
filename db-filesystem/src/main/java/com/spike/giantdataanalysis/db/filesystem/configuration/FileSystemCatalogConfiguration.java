@@ -1,6 +1,6 @@
 package com.spike.giantdataanalysis.db.filesystem.configuration;
 
-import com.spike.giantdataanalysis.sequences.Constant;
+import com.spike.giantdataanalysis.db.commons.Constant;
 
 public class FileSystemCatalogConfiguration {
   private String catalogRootDir = "target/catalog/";

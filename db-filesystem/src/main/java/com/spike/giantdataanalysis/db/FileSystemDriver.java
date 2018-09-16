@@ -16,7 +16,7 @@ public class FileSystemDriver {
     this.configuration = configuration;
   }
 
-  public void start() {
+  protected void start() {
     FileSystemCache.I().clear();
     fileCatalogManager = new FileCatalogManager(configuration);
     fileCatalogManager.initialize();

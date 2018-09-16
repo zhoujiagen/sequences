@@ -19,7 +19,6 @@ import com.spike.giantdataanalysis.db.filesystem.configuration.FileSystemConfigu
 import com.spike.giantdataanalysis.db.filesystem.core.FileAccessModeEnum;
 import com.spike.giantdataanalysis.db.filesystem.core.FileAllocationParameter;
 import com.spike.giantdataanalysis.db.filesystem.core.FileBlockEntity;
-import com.spike.giantdataanalysis.db.filesystem.core.FileBlockHeader;
 import com.spike.giantdataanalysis.db.filesystem.core.FileEntity;
 import com.spike.giantdataanalysis.db.filesystem.core.cache.CacheTargetEnum;
 import com.spike.giantdataanalysis.db.filesystem.core.cache.FileSystemCache;
@@ -164,7 +163,7 @@ public class LocalFileSystem implements IFileSystem {
       int startBlockByteOffset = blockSizeInByte * blockIndex;
 
       fileEntity.getHandler().seek(startBlockByteOffset);
-      FileBlockHeader blockHeader = FileBlockHeader.from(blockSizeInByte, result);
+      FileBlockHeader blockHeader = new FileBlockHeader(blockSizeInByte, result);
       result.setHeader(blockHeader);
 
       rLock = blockHeader.lock().readLock();
@@ -205,7 +204,7 @@ public class LocalFileSystem implements IFileSystem {
 
     try {
       fileEntity.getHandler().seek(blockSizeInByte * blockIndex);
-      FileBlockHeader blockHeader = FileBlockHeader.from(blockSizeInByte, result);
+      FileBlockHeader blockHeader = new FileBlockHeader(blockSizeInByte, result);
       result.setHeader(blockHeader);
 
       rLock = blockHeader.lock().readLock();
@@ -238,7 +237,7 @@ public class LocalFileSystem implements IFileSystem {
         FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, blockIndex + i);
         byte[] bytes = new byte[blockSizeInByte];
         fileEntity.getHandler().seek(blockSizeInByte * blockIndex);
-        FileBlockHeader blockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
+        FileBlockHeader blockHeader = new FileBlockHeader(blockSizeInByte, fileBlockEntity);
         fileBlockEntity.setHeader(blockHeader);
 
         rLock = blockHeader.lock().readLock();
@@ -281,7 +280,7 @@ public class LocalFileSystem implements IFileSystem {
 
       // read file block header
       FileBlockEntity fileBlockEntity = new FileBlockEntity(fileEntity, blockIndex);
-      FileBlockHeader fileBlockHeader = FileBlockHeader.from(blockSizeInByte, fileBlockEntity);
+      FileBlockHeader fileBlockHeader = new FileBlockHeader(blockSizeInByte, fileBlockEntity);
 
       wLock = fileBlockHeader.lock().writeLock();
       wLock.lock();
@@ -351,7 +350,7 @@ public class LocalFileSystem implements IFileSystem {
           // read file block header
           fileEntity.getHandler().seek(currentBlockStartByteOffset);
           FileBlockHeader fileBlockHeader =
-              FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity,
+              new FileBlockHeader(blockSizeInByte, new FileBlockEntity(fileEntity,
                   currentBlockIndex));
 
           int currentWriteByteCount = blockSizeInByte - fileBlockHeader.getReprByteSize();
@@ -397,10 +396,10 @@ public class LocalFileSystem implements IFileSystem {
         // read file block header to find empty block to append all data
         fileEntity.getHandler().seek(currentBlockStartByteOffset);
         FileBlockHeader currentFileBlockHeader =
-            FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity, blockIndex));
+            new FileBlockHeader(blockSizeInByte, new FileBlockEntity(fileEntity, blockIndex));
         fileEntity.getHandler().seek(nextBlockStartByteOffset);
         FileBlockHeader nextFileBlockHeader =
-            FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity, blockIndex + 1));
+            new FileBlockHeader(blockSizeInByte, new FileBlockEntity(fileEntity, blockIndex + 1));
 
         int currentBlockIndex = blockIndex;
         while (nextFileBlockHeader.getFreeByteOffset() > nextFileBlockHeader.getReprByteSize()) {
@@ -410,7 +409,7 @@ public class LocalFileSystem implements IFileSystem {
           nextBlockStartByteOffset += blockSizeInByte;
           fileEntity.getHandler().seek(nextBlockStartByteOffset);
           nextFileBlockHeader =
-              FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity,
+              new FileBlockHeader(blockSizeInByte, new FileBlockEntity(fileEntity,
                   currentBlockIndex++));
         }
 
@@ -424,7 +423,7 @@ public class LocalFileSystem implements IFileSystem {
           // read file block header
           fileEntity.getHandler().seek(currentBlockStartByteOffset);
           FileBlockHeader fileBlockHeader =
-              FileBlockHeader.from(blockSizeInByte, new FileBlockEntity(fileEntity,
+              new FileBlockHeader(blockSizeInByte, new FileBlockEntity(fileEntity,
                   currentBlockIndex));
 
           wLock = fileBlockHeader.lock().writeLock();
