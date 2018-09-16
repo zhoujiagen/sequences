@@ -4,12 +4,18 @@ public interface file {
   /**
    * File handle: FILEID.
    */
+  @Deprecated
   public class FILE implements Comparable<FILE> {
 
     public String filename; // absolute path or relative path
     public int fileno; // FILENO: uniquely assigned by file system
 
     public FILE() {
+    }
+
+    public FILE(FILE file) {
+      this.filename = file.filename;
+      this.fileno = file.fileno;
     }
 
     public FILE(int fileno, String filename) {

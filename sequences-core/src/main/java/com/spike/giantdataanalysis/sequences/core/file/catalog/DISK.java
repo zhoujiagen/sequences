@@ -1,9 +1,9 @@
 package com.spike.giantdataanalysis.sequences.core.file.catalog;
 
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.BEGIN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.END;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.SEP;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.BEGIN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.END;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.SEP;
 
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -13,18 +13,16 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.spike.giantdataanalysis.sequences.exception.FileCatalogException;
-import com.spike.giantdataanalysis.sequences.exception.FileSystemException;
-import com.spike.giantdataanalysis.sequences.serialize.Dumpable;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.Ops;
+import com.spike.giantdataanalysis.db.commons.serialize.Dumpable;
+import com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.Ops;
+import com.spike.giantdataanalysis.db.commons.serialize.Stringable;
 
 /**
  * Disk with addressing tuple: (磁盘标识diskid, 柱面号cylinderno, 磁道号trackno, 槽号slotno).
  * <p>
  * WARNIG: just a mocking object.
  */
-public class DISK implements Dumpable, MoreSerializable.Stringable<DISK> {
+public class DISK implements Dumpable, Stringable<DISK> {
   private static final long serialVersionUID = 1L;
 
   public static DISK NULL = new DISK(0);
@@ -66,7 +64,7 @@ public class DISK implements Dumpable, MoreSerializable.Stringable<DISK> {
 
   @Override
   public int size() {
-    throw FileSystemException.newE("not used");
+    return -1;
   }
 
   @Override
@@ -117,7 +115,7 @@ public class DISK implements Dumpable, MoreSerializable.Stringable<DISK> {
 
   public DISK(String diskid, int slotSize) {
     if (slotSize < 0) {
-      throw FileCatalogException.newE("invalid slotSize");
+      throw new IllegalArgumentException("invalid slotSize");
     }
     this.diskid = diskid;
     // this.slots = new SLOT[slotSize];

@@ -1,6 +1,6 @@
 package com.spike.giantdataanalysis.sequences.core.file.catalog;
 
-import com.spike.giantdataanalysis.sequences.serialize.Dumpable;
+import com.spike.giantdataanalysis.db.commons.serialize.Dumpable;
 
 public class SLOT implements Dumpable {
   public String diskid = DISK.DEFAULT_ID;

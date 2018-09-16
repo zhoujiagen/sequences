@@ -1,14 +1,13 @@
 package com.spike.giantdataanalysis.sequences.core.file.log;
 
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.BEGIN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.END;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.LONG_MAX_STRING_LEN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.SEP;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.BEGIN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.END;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.LONG_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.SEP;
 
 import com.google.common.base.Strings;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
-
-public class LSN implements MoreSerializable.Stringable<LSN> {
+import com.spike.giantdataanalysis.db.commons.serialize.Stringable;
+public class LSN implements Stringable<LSN> {
   private static final long serialVersionUID = 6268301188928797446L;
 
   // file no in directory

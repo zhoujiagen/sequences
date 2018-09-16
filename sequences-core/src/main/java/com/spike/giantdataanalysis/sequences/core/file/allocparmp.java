@@ -1,18 +1,17 @@
 package com.spike.giantdataanalysis.sequences.core.file;
 
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.BEGIN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.END;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.FLOAT_MAX_STRING_LEN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.SEP;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.BEGIN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.END;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.FLOAT_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.SEP;
 
 import com.google.common.base.Strings;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
-
+import com.spike.giantdataanalysis.db.commons.serialize.Stringable;
 /**
  * Allocation parameter.
  */
-public class allocparmp implements MoreSerializable.Stringable<allocparmp> {
+public class allocparmp implements Stringable<allocparmp> {
   private static final long serialVersionUID = 1L;
 
   public static allocparmp NULL = new allocparmp();

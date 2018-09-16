@@ -1,17 +1,16 @@
 package com.spike.giantdataanalysis.sequences.core.file.catalog;
 
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.BEGIN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.END;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
-import static com.spike.giantdataanalysis.sequences.serialize.MoreSerializable.SEP;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.BEGIN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.END;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.INTEGER_MAX_STRING_LEN;
+import static com.spike.giantdataanalysis.db.commons.serialize.MoreSerializable.SEP;
 
 import com.google.common.base.Strings;
-import com.spike.giantdataanalysis.sequences.serialize.MoreSerializable;
-
+import com.spike.giantdataanalysis.db.commons.serialize.Stringable;
 /**
  * Extent: a set of contiguous block.
  */
-public class EXTENT implements MoreSerializable.Stringable<EXTENT> {
+public class EXTENT implements Stringable<EXTENT> {
   private static final long serialVersionUID = 1L;
 
   public static EXTENT NULL = new EXTENT();
