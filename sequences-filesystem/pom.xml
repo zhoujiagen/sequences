@@ -30,7 +30,7 @@
 
 		<dependency>
 			<groupId>com.spike.giantdataanalysis</groupId>
-			<artifactId>commons</artifactId>
+			<artifactId>db-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

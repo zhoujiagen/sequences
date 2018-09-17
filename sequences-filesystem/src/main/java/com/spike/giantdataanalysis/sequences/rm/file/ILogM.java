@@ -1,7 +1,6 @@
 package com.spike.giantdataanalysis.sequences.rm.file;
 
 import com.spike.giantdataanalysis.db.filesystem.IFileSystem;
-import com.spike.giantdataanalysis.db.filesystem.LocalFileSystem;
 import com.spike.giantdataanalysis.db.filesystem.core.FileAccessModeEnum;
 import com.spike.giantdataanalysis.sequences.core.file.log.LSN;
 import com.spike.giantdataanalysis.sequences.core.file.log.LogRecord;
@@ -16,7 +15,7 @@ public interface ILogM {
     public String directory2;
     public String filePreix = "LOG";
     public int nameLength = 10;
-    public IFileSystem fileSystem = new LocalFileSystem(null); // ???
+    public IFileSystem fileSystem = null;// new LocalFileSystem(null); // ???
 
     public long lsnCacheThreshold = Long.MAX_VALUE;
 
