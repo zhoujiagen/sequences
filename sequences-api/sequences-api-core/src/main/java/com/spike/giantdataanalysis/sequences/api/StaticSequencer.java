@@ -60,7 +60,8 @@ public final class StaticSequencer {
    * @param toAdd
    * @return
    */
-  private static int increase(char[] source, int index, String dict, String skip, int toAdd) {
+  private static int increase(char[] source, final int index, final String dict, final String skip,
+      final int toAdd) {
     int incr = 0;
 
     final int dictLength = dict.length();
@@ -149,7 +150,8 @@ public final class StaticSequencer {
     NUMBER("0123456789", "", '0'), //
     CHARACTER("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "", '0'), //
     NUMER_CHARACTER("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", "", '0'), //
-    SPECIAL_CHARACTER("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ISOZ", '0');
+    SPECIAL_CHARACTER("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ISOZ", '0'), //
+    SPECIAL_NUMBER("0123456789", "0", '0'); //
 
     private String dict;
     private String skip;

@@ -41,9 +41,12 @@ public class TestStaticSequencer {
   public void bordercase_largeStep() {
     int length = 3;
     String start = "000";
+    start = "111";
     while (true) {
       LOG.debug(start);
-      start = StaticSequencer.next(SequenceCategory.SPECIAL_CHARACTER, length, start, 100);
+      // start = StaticSequencer.next(SequenceCategory.SPECIAL_CHARACTER, length, start, 100);
+      // start = StaticSequencer.next(SequenceCategory.NUMBER, length, start, 100);
+      start = StaticSequencer.next(SequenceCategory.SPECIAL_NUMBER, length, start, 89);
     }
   }
 }
