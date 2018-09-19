@@ -49,7 +49,25 @@ public final class StaticSequencer {
         break;
       }
     }
-    return new String(sourceArray);
+
+    // 护卫语句
+    String result = new String(sourceArray);
+    Preconditions.checkState(result.length() == source.length());
+    Preconditions.checkState(!result.equals(source));
+    for (int i = 0; i < result.length(); i++) {
+      char charInSource = source.charAt(i);
+      char charInResult = result.charAt(i);
+      // 第一个不相等的字符
+      if (charInSource != charInResult) {
+        Preconditions.checkState(//
+            sequenceCategory.dict.indexOf(charInSource) < sequenceCategory.dict
+                .indexOf(charInResult));
+        break;
+      }
+
+    }
+
+    return result;
   }
 
   /**
