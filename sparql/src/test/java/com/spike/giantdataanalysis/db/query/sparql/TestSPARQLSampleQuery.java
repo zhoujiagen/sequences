@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
-public class TestSPARQLQuery {
+public class TestSPARQLSampleQuery {
 
   public static String TEST_QUERY_DIR = "src/test/resources/sparql";
   private static int index = 1;
@@ -95,5 +95,4 @@ public class TestSPARQLQuery {
     // System.out.println();
     index++;
   }
-
 }
