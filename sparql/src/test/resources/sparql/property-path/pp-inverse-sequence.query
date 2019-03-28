@@ -1,5 +1,0 @@
-SELECT * WHERE
-{
-    ?x foaf:knows/^foaf:knows ?y .  
-    FILTER(?x != ?y)
-  }

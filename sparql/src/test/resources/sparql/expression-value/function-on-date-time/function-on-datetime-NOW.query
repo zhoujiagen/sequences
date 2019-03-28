@@ -1,3 +1,0 @@
-SELECT
-	(now() AS ?x)
-{}

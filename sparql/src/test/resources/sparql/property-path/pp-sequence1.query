@@ -1,5 +1,0 @@
-SELECT * WHERE
-{
-    ?x foaf:mbox <mailto:alice@example> .
-    ?x foaf:knows / foaf:name ?name .
-  }

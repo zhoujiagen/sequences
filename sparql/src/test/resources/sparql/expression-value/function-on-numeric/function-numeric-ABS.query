@@ -1,4 +1,0 @@
-SELECT
-	(abs(1) AS ?x)
-	(abs(-1.5) AS ?x)
-{}
