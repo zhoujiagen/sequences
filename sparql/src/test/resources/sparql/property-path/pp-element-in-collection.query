@@ -1,2 +1,0 @@
-SELECT * WHERE
-{ :list rdf:rest* / rdf:first ?element }

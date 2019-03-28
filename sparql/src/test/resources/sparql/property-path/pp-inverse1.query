@@ -1,2 +1,0 @@
-SELECT * WHERE
-{ <mailto:alice@example> ^foaf:mbox ?x }
